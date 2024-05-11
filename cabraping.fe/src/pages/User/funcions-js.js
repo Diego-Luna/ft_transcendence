@@ -1,8 +1,10 @@
 import { showNotification } from '../../components/showNotification.js';
+import getHash from "../../utils/getHash.js";
 
 const BACKEND_URL = "http://localhost:8000";
 let jwt;
 let myUser = null;
+let see_user_id;
 
 export async function User_js() {
 
@@ -12,19 +14,23 @@ export async function User_js() {
       return;
   }
 
+  see_user_id = getHash();
+  console.log("-- 🤠 💀 -> user_id:", see_user_id);
+
   await updateInfo();
-  const form = document.getElementById('data-info');
-  if (form) {
-    console.log("-> form is valid");
-    form.addEventListener('submit', FormSendData);
-  }
+  // const form = document.getElementById('data-info');
+  // if (form) {
+  //   console.log("-> form is valid");
+  //   form.addEventListener('submit', FormSendData);
+  // }
 
 }
 
 async function updateInfo(){
 
   // const responseMyUser = await fetch(`${BACKEND_URL}/api/me/`, {
-  const responseMyUser = await fetch(`${BACKEND_URL}/api/me-full/`, {
+  // const responseMyUser = await fetch(`${BACKEND_URL}/api/me-full/`, {
+  const responseMyUser = await fetch(`${BACKEND_URL}/api/users/${see_user_id}`, {
     headers: { Authorization: `Bearer ${jwt}` },
   });
   myUser = await responseMyUser.json();

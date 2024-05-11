@@ -33,6 +33,7 @@ const routes = {
   "/chat": [Chat_html, Chat_js],
   "/chat/:id": [Chat_html, Chat_js],
   "/user": [User_html, User_js],
+  "/user/:id": [User_html, User_js],
   "/users": [Users_html, Users_js],
   "/friends": [Friends_html, Friends_js],
   "/404": [Error404_html, Error404_js],

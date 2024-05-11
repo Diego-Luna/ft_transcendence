@@ -52,8 +52,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # /api/users
     def get_serializer_class(self):
+
+        print("🙀🙀 id 1")
+
         # GET /api/users/
         # GET /api/users/<pk>
+        return UserSerializer
         if self.action in ["list", "retrieve"]:
             return UserDataSerializer
         # POST /api/users/
@@ -73,6 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # GET /api/users/<pk>/games_as_inviter/
     @action(detail=True, methods=["get"])
     def games_as_inviter(self, request, pk=None):
+        print("🙀🙀 id 2")
         user = self.get_object()
         inviter_games = user.games_as_inviter.all()
         serializer = GameSerializer(inviter_games, many=True)
@@ -82,6 +87,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # GET /api/users/<pk>/games_as_invitee/
     @action(detail=True, methods=["get"])
     def games_as_invitee(self, request, pk=None):
+        print("🙀🙀 id 3")
         user = self.get_object()
         invitee_games = user.games_as_invitee.all()
         serializer = GameSerializer(invitee_games, many=True)

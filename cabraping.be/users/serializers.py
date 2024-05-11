@@ -16,7 +16,8 @@ class UserSerializerUpdate(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "email", "password", "nickname", "first_name", "last_name", "avatarImageURL"]
+        # fields = ["id", "username", "email", "password", "nickname", "first_name", "last_name", "avatarImageURL"]
+        fields = ["id", "username", "email", "password", "nickname", "first_name", "last_name", "avatarImageURL", "friends"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def validate_avatarImageURL(self, value):
