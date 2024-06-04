@@ -38,6 +38,18 @@ services:
       - DB_PASS=${DB_PASS}
       - DB_HOST=database
       - DB_PORT=5432
+  
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
 
   frontend:
     build:

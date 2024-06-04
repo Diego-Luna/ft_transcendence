@@ -4,7 +4,7 @@ import { showNotification } from "../../components/showNotification.js"
 const frontendURL = new URL(window.location.href);
 const serverIPAddress = frontendURL.hostname;
 const serverPort = 8000; // Specify the port your backend server is running on
-const BACKEND_URL = `http://${serverIPAddress}:${serverPort}`;
+const BACKEND_URL = `https://${serverIPAddress}:${serverPort}`;
 
 export function createUser(email, password) {
   const username = email.split('@')[0];

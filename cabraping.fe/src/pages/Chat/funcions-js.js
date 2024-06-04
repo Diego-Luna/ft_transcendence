@@ -9,7 +9,7 @@ let image = "assets/logo.svg";
 const frontendURL = new URL(window.location.href);
 const serverIPAddress = frontendURL.hostname;
 const serverPort = 8000; // Specify the port your backend server is running on
-const BACKEND_URL = `http://${serverIPAddress}:${serverPort}`;
+const BACKEND_URL = `https://${serverIPAddress}:${serverPort}`;
 const WS_URL = `ws://${serverIPAddress}:${serverPort}`;
 
 console.log(BACKEND_URL);

@@ -34,3 +34,5 @@ transcendence/
 /cabraping.be/.env.development.local
 /cabraping.be/.env.test.local
 /cabraping.be/.env.production.local
+
+!/nginx/
