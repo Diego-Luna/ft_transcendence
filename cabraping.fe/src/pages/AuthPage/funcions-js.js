@@ -2,6 +2,7 @@
 
 import { loginUser } from "./loginUser.js"
 import { createUser } from "./createUser.js"
+import { validateAndSanitizeInput } from "../../components/security.js";
 
 // export function AuthPageInit() {
 export function AuthPage_js() {
@@ -19,6 +20,10 @@ export function AuthPage_js() {
     e.preventDefault();
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
+
+    if (!validateAndSanitizeInput(password) || !validateAndSanitizeInput(username))
+      return;
+
     loginUser(username, password);
   });
 
@@ -27,6 +32,10 @@ export function AuthPage_js() {
     e.preventDefault();
     const email = document.getElementById("new-username").value;
     const password = document.getElementById("new-password").value;
+
+    if (!validateAndSanitizeInput(email) || !validateAndSanitizeInput(password))
+      return;
+
     createUser(email, password);
   });
 }

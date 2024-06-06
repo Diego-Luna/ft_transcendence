@@ -2,6 +2,7 @@
 import { getHash } from "../../utils/getHash.js";
 import { showNotification, showNotificationPopup } from '../../components/showNotification.js';
 import { BACKEND_URL, sendAcceptedGameNotifications, sendChannelCreatedNotifications, sendGameInvataeNotifications, WS_URL } from "../../components/wcGlobal.js";
+import { validateAndSanitizeInput } from "../../components/security.js";
 
 let image = "assets/logo.svg";
 
@@ -441,7 +442,14 @@ async function unlockUser(userId) {
 
 
 function handleSendClick() {
+
   const textarea = document.getElementById('messageTextarea');
+
+  if (!validateAndSanitizeInput(textarea.value))
+  {
+    return
+  }
+
   if (textarea && sockets[channel_now]) { // Check if the current channel connection exists
       const message = textarea.value;
       if (message.trim() !== '') {
@@ -508,6 +516,11 @@ function isUserBlocked(userId) {
 }
 
 function saveMessageToLocalStorage(message) {
+
+  if (!validateAndSanitizeInput(message.message)){
+    return
+  }
+
   let messages = JSON.parse(localStorage.getItem(`messages_channel_${message.channel}`)) || [];
   messages.push(message);
   localStorage.setItem(`messages_channel_${message.channel}`, JSON.stringify(messages));

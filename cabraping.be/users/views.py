@@ -66,7 +66,6 @@ class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Suponiendo que la autenticación ya está manejada correctamente
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
