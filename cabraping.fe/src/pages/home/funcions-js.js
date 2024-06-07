@@ -2,7 +2,7 @@
 const frontendURL = new URL(window.location.href);
 const serverIPAddress = frontendURL.hostname;
 const serverPort = 8000; // Specify the port your backend server is running on
-const BACKEND_URL = `https://${serverIPAddress}:${serverPort}`;
+const BACKEND_URL = `http://${serverIPAddress}:${serverPort}`;
 
 export function Home_js() {
   let buttonAuth = document.getElementById("button-auth");
@@ -15,7 +15,7 @@ export function Home_js() {
 }
 
 async function redirect42() {
-  const redirectURI = encodeURIComponent(`${BACKEND_URL}/callback/`);
+  const redirectURI = encodeURIComponent(`${BACKEND_URL}/api/callback/`);
 
   try {
     // Fetch configuration from backend

@@ -17,10 +17,14 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
+    networks:
+      - app-network
 
   redis:
     image: "redis:alpine"
     container_name: transcendence_redis
+    networks:
+      - app-network
 
   backend:
     build:
@@ -38,16 +42,20 @@ services:
       - DB_PASS=${DB_PASS}
       - DB_HOST=database
       - DB_PORT=5432
+    networks:
+      - app-network
   
 
-  nginx:
+  apache:
     build:
       context: .
-      dockerfile: nginx/Dockerfile
-    container_name: nginx
+      dockerfile: apache/Dockerfile
+    container_name: apache
     ports:
       - "80:80"
       - "443:443"
+    networks:
+      - app-network
     depends_on:
       - backend
 
@@ -62,6 +70,12 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=production
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

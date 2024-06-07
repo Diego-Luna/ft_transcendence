@@ -71,11 +71,6 @@ INSTALLED_APPS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # Allow requests from this origin
-    "https://example.com",    # Another allowed origin
-]
-
 CORS_ALLOW_HEADERS = [
     "Content-Type",
     "Authorization",
@@ -240,13 +235,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect HTTP to HTTPS
 SECURE_SSL_REDIRECT = True
 
-# Use secure headers
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Other security settings
-SECURE_HSTS_SECONDS = 3600
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600 # increase to 1 year eventually
+SECURE_SSL_REDIRECT = True #re enable in product
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
