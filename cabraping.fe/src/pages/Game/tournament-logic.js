@@ -22,14 +22,14 @@ async function update_winer_of_tournament(tournamentId, winer) {
         })
     });
 
-    showNotificationPopup("You won congratulations the tournament", `success`);
-    console.log("is finish!!!!!!!");
+    showNotificationPopup("You are the champion of the tournament. Congratulations!!", `success`);
+    console.log("is finished!!!!!!!");
     window.location.href = `/#`;
 
 
 }
 
-export async function Send_data_bacnd_the_winer(first_player, secong_player, winer) {
+export async function Send_data_bacnd_the_winner(first_player, second_player, winner) {
 
     // localStorage.setItem('currentTournamentId', pendingTournament.id);
     let tournament_id = localStorage.getItem("currentTournamentId");
@@ -79,8 +79,8 @@ export async function Send_data_bacnd_the_winer(first_player, secong_player, win
           body: JSON.stringify({
             tournament: tournament_id,
             participant1: first_player,
-            participant2: secong_player,
-            winner: winer
+            participant2: second_player,
+            winner: winner
           }),
         }
     );

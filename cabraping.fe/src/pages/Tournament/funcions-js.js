@@ -2,8 +2,12 @@ import { getToken } from "../../utils/get-token.js";
 import { showNotification, showNotificationPopup } from '../../components/showNotification.js';
 import { sendTournamentInvitation, activeWebSockets, handleTournamentWebSocketMessage, getUserIdByUsername, BACKEND_URL } from '../../components/wcGlobal.js';
 import { getUserIdFromJWT } from "../Chat/funcions-js.js";
+<<<<<<< Updated upstream
 import { handleTournamentCanceled } from "../TournamentWaitingArea/functions-js.js";
 import { checkUsers_is_part_of_valid_tournament, getTournamentForId } from "./cancel.js";
+=======
+import { fetchParticipants, handleTournamentCanceled } from "../TournamentWaitingArea/functions-js.js";
+>>>>>>> Stashed changes
 
 export async function WS_check_the_torunament_pending() {
     
@@ -300,6 +304,16 @@ async function handleAddParticipant(e) {
         return;
     }
 
+<<<<<<< Updated upstream
+=======
+    const participants = await fetchParticipants(tournamentId);
+    if (participants.length >= 4) {
+        displayErrorMessage('You can only invite three other participants.');
+        return;
+    }
+
+    console.log("--->Send invite to participantName:", participantName);
+>>>>>>> Stashed changes
     const isOnline = await checkUserOnlineStatus(participantName);
 
 
