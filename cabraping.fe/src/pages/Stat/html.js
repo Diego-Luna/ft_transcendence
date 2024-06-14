@@ -27,6 +27,7 @@ export async function Stat_html() {
             <tr>
               <th class="table-dark">Winner</th>
               <th class="table-dark">Loser</th>
+              <th class="table-dark">Score</th>
               <th class="table-dark">Time</th>
               <th class="table-dark">Date</th>
             </tr>
@@ -70,10 +71,11 @@ export async function Stat_html() {
               </tr>
             </tbody>
           </table>
-        </div>
+        </div> 
       </div>
     </div>
   `;
 }
+
 
 
