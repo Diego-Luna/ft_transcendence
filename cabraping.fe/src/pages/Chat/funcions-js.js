@@ -1,8 +1,15 @@
 // import image from '../../assets/logo.svg';
 import { getHash } from "../../utils/getHash.js";
-import { showNotification, showNotificationPopup } from '../../components/showNotification.js';
+import {
+  showNotification,
+  showNotificationPopup,
+} from "../../components/showNotification.js";
 import { BACKEND_URL, WS_URL } from "../../components/wcGlobal.js";
-import { sendAcceptedGameNotifications, sendChannelCreatedNotifications, sendGameInviteNotifications } from "../../components/wcGlobal-funcions-send-message.js";
+import {
+  sendAcceptedGameNotifications,
+  sendChannelCreatedNotifications,
+  sendGameInviteNotifications,
+} from "../../components/wcGlobal-funcions-send-message.js";
 import { getToken } from "../../utils/get-token.js";
 import { validateAndSanitizeInput } from "../../components/security.js";
 
@@ -24,11 +31,10 @@ let array_channels;
 let myUser = null;
 
 export async function Chat_Update_js() {
-
-  console.log("= reload ? Chat_Update_js:");
-  const jwt = localStorage.getItem('jwt');
+  // console.log("= reload ? Chat_Update_js:");
+  const jwt = localStorage.getItem("jwt");
   if (!jwt) {
-      return;
+    return;
   }
 
   // Extract user_id from JWT
@@ -39,7 +45,7 @@ export async function Chat_Update_js() {
   });
   myUser = await responseMyUser.json();
 
-  console.log("= reload ? myUser:", myUser);
+  // console.log("= reload ? myUser:", myUser);
   if (myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
     window.location.replace("/#logout");
   }
@@ -47,10 +53,10 @@ export async function Chat_Update_js() {
 
   channels = await getUserChannels(myUser.id);
 
-  console.log("update channels:", channels);
+  // console.log("update channels:", channels);
 
-  console.log(">>>>> channel_now:", channel_now);
-  if (channel_now !== "/"){
+  // console.log(">>>>> channel_now:", channel_now);
+  if (channel_now !== "/") {
     switchChannel(channel_now);
   }
 
@@ -58,411 +64,420 @@ export async function Chat_Update_js() {
     updateChannelList(channels); // Call the new function to update the channels dropdown
     channel = channels[0].id; // Sets the first channel as the current channel
     // Subscribe to all channels
-    channels.forEach(channel => {
+    channels.forEach((channel) => {
       createWebSocketConnection(channel.id);
-  });
+    });
   }
 
   // checkRequestGame();
 }
 
 export async function Chat_js() {
-
-    const jwt = localStorage.getItem('jwt');
-    if (!jwt) {
-        return;
-    }
-
-    // Extract user_id from JWT
-    const payload = jwt.split('.')[1];
-    const decodedPayload = JSON.parse(atob(payload));
-    user_id = decodedPayload.user_id; // Update user_id variable with the user ID extracted from the JWT
-
-    let route = getHash();
-    console.log(`-> 🦾 this.route :${route}`);
-
-    channel_now = route;
-
-    if (route != '/'){
-      channel = route;
-    }
-
-    const responseMyUser = await fetch(`${BACKEND_URL}/api/me/`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    myUser = await responseMyUser.json();
-
-    if (myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
-      window.location.replace("/#logout");
-    }
-    UserName = myUser.username;
-
-    blocks_users_frontend(jwt);
-
-    // Agregar evento para el botón "Block User"
-    const blockUserButton = document.getElementById('blockUserButton');
-    if (blockUserButton) {
-      blockUserButton.disabled = true;
-      blockUserButton.addEventListener('click', () => blockUser(communication_user_id));
-    }
-
-    // Agregar evento para el botón "Block User"
-    const inviteGameButtonButton = document.getElementById('inviteGameButton');
-    if (inviteGameButtonButton) {
-      inviteGameButtonButton.disabled = true;
-      inviteGameButtonButton.addEventListener('click', () => inviteGame(jwt));
-    }
-
-    // Agregar evento para el botón "Users"
-    const usersRouteButton = document.getElementById('usersRouteButton');
-    if (usersRouteButton) {
-      usersRouteButton.disabled = true;
-      usersRouteButton.addEventListener('click', () => window.location.href = `#user/${communication_user_id}`);
-    }
-
-    const acceptGameButton = document.getElementById('acceptGameButton');
-    if (acceptGameButton) {
-      acceptGameButton.disabled = true;
-      acceptGameButton.addEventListener('click', () => acceptGame());
-    }
-
-    const button = document.getElementById('addChannel');
-    if (button) {
-      button.addEventListener('click', handleButtonClick);
-    }
-
-    // Listen for clicks on the send button.
-    const sendButton = document.getElementById('sendButton');
-    if (sendButton) {
-      sendButton.disabled = true;
-      sendButton.addEventListener('click', handleSendClick);
-    }
-
-    // Manage clicks on the add channel button.
-    const saveChannelButton = document.getElementById('saveChannelButton');
-    if (saveChannelButton) {
-      saveChannelButton.addEventListener('click', handleSaveChannelClick);
-    }
-
-    let userId = getUserIdFromJWT();
-    const channels = await getUserChannels(userId);
-    // channels = await getUserChannels_filter_blockuser(userId);
-
-    // let filter = await getUserChannels_filter_blockuser(userId);
-    // console.log("getUserChannels_filter_blockuser", filter);
-
-    if (channels.length > 0) {
-      updateChannelList(channels); // Call the new function to update the channels dropdown
-      channel = channels[0].id; // Sets the first channel as the current channel
-
-      // Subscribe to all channels
-      channels.forEach(channel => {
-        createWebSocketConnection(channel.id);
-    });
-    }
-
-    checkRequestGame();
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt) {
+    return;
   }
 
-  // Función para mostrar amigos conectados
+  // Extract user_id from JWT
+  const payload = jwt.split(".")[1];
+  const decodedPayload = JSON.parse(atob(payload));
+  user_id = decodedPayload.user_id; // Update user_id variable with the user ID extracted from the JWT
+
+  let route = getHash();
+  // console.log(`-> 🦾 this.route :${route}`);
+
+  channel_now = route;
+
+  if (route != "/") {
+    channel = route;
+  }
+
+  const responseMyUser = await fetch(`${BACKEND_URL}/api/me/`, {
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+  myUser = await responseMyUser.json();
+
+  if (myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
+    window.location.replace("/#logout");
+  }
+  UserName = myUser.username;
+
+  blocks_users_frontend(jwt);
+
+  // Agregar evento para el botón "Block User"
+  const blockUserButton = document.getElementById("blockUserButton");
+  if (blockUserButton) {
+    blockUserButton.disabled = true;
+    blockUserButton.addEventListener("click", () =>
+      blockUser(communication_user_id)
+    );
+  }
+
+  // Agregar evento para el botón "Block User"
+  const inviteGameButtonButton = document.getElementById("inviteGameButton");
+  if (inviteGameButtonButton) {
+    inviteGameButtonButton.disabled = true;
+    inviteGameButtonButton.addEventListener("click", () => inviteGame(jwt));
+  }
+
+  // Agregar evento para el botón "Users"
+  const usersRouteButton = document.getElementById("usersRouteButton");
+  if (usersRouteButton) {
+    usersRouteButton.disabled = true;
+    usersRouteButton.addEventListener(
+      "click",
+      () => (window.location.href = `#user/${communication_user_id}`)
+    );
+  }
+
+  const acceptGameButton = document.getElementById("acceptGameButton");
+  if (acceptGameButton) {
+    acceptGameButton.disabled = true;
+    acceptGameButton.addEventListener("click", () => acceptGame());
+  }
+
+  const button = document.getElementById("addChannel");
+  if (button) {
+    button.addEventListener("click", handleButtonClick);
+  }
+
+  // Listen for clicks on the send button.
+  const sendButton = document.getElementById("sendButton");
+  if (sendButton) {
+    sendButton.disabled = true;
+    sendButton.addEventListener("click", handleSendClick);
+  }
+
+  // Manage clicks on the add channel button.
+  const saveChannelButton = document.getElementById("saveChannelButton");
+  if (saveChannelButton) {
+    saveChannelButton.addEventListener("click", handleSaveChannelClick);
+  }
+
+  let userId = getUserIdFromJWT();
+  const channels = await getUserChannels(userId);
+  // channels = await getUserChannels_filter_blockuser(userId);
+
+  // let filter = await getUserChannels_filter_blockuser(userId);
+  // console.log("getUserChannels_filter_blockuser", filter);
+
+  if (channels.length > 0) {
+    updateChannelList(channels); // Call the new function to update the channels dropdown
+    channel = channels[0].id; // Sets the first channel as the current channel
+
+    // Subscribe to all channels
+    channels.forEach((channel) => {
+      createWebSocketConnection(channel.id);
+    });
+  }
+
+  checkRequestGame();
+}
+
+// Función para mostrar amigos conectados
 export function showActiveFriends(friends, check_id) {
-
-  console.log(">> showActiveFriends > friends:", friends);
-  if (!friends.some(friend => String(friend.id) === String(check_id))){
-    return null
+  // console.log(">> showActiveFriends > friends:", friends);
+  if (!friends.some((friend) => String(friend.id) === String(check_id))) {
+    return null;
   }
 
-  const activeUserIds = JSON.parse(localStorage.getItem('id_active_users')) || [];
-  console.log(">> showActiveFriends > activeUserIds:", activeUserIds);
-  const activeFriends = friends.filter(friend => activeUserIds.includes(String(friend.id)));
-  console.log(">> showActiveFriends > activeFriends:", activeFriends);
+  const activeUserIds =
+    JSON.parse(localStorage.getItem("id_active_users")) || [];
+  // console.log(">> showActiveFriends > activeUserIds:", activeUserIds);
+  const activeFriends = friends.filter((friend) =>
+    activeUserIds.includes(String(friend.id))
+  );
+  // console.log(">> showActiveFriends > activeFriends:", activeFriends);
 
   // if (activeFriends[0] && String(activeFriends[0].id) === String(check_id)) {
-  if (activeFriends.length > 0 && activeFriends.some(friend => String(friend.id) === String(check_id))) {
-    return true
+  if (
+    activeFriends.length > 0 &&
+    activeFriends.some((friend) => String(friend.id) === String(check_id))
+  ) {
+    return true;
   }
-  return false
+  return false;
 }
 
 async function inviteGame(jwt) {
   if (communication_user_id < 1) {
-      return;
+    return;
   }
 
   const responseGames = await fetch(`${BACKEND_URL}/api/games/`, {
-      headers: { Authorization: `Bearer ${jwt}` },
+    headers: { Authorization: `Bearer ${jwt}` },
   });
   const games = await responseGames.json();
 
   const existingGame = games.find(
-      (game) =>
-          game.invitationStatus === "PENDING" &&
-          ((game.invitee.id === myUser.id && game.inviter.id === communication_user_id) ||
-          (game.inviter.id === myUser.id && game.invitee.id === communication_user_id))
+    (game) =>
+      game.invitationStatus === "PENDING" &&
+      ((game.invitee.id === myUser.id &&
+        game.inviter.id === communication_user_id) ||
+        (game.inviter.id === myUser.id &&
+          game.invitee.id === communication_user_id))
   );
 
   if (existingGame) {
-      showNotification('There is already a pending game invitation', 'warning');
-      return;
+    showNotification("There is already a pending game invitation", "warning");
+    return;
   }
 
   const response = await fetch(`${BACKEND_URL}/api/games/`, {
-      method: "POST",
-      headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-          playMode: 2,
-          invitationStatus: "PENDING",
-          inviter: myUser.id,
-          invitee: communication_user_id,
-      }),
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      playMode: 2,
+      invitationStatus: "PENDING",
+      inviter: myUser.id,
+      invitee: communication_user_id,
+    }),
   });
 
   if (response.ok) {
-      showNotification('Sent invitation', 'success');
-      sendGameInviteNotifications(user_id, UserName, communication_user_id, "sendGameInviteNotifications");
+    showNotification("Sent invitation", "success");
+    sendGameInviteNotifications(
+      user_id,
+      UserName,
+      communication_user_id,
+      "sendGameInviteNotifications"
+    );
   } else {
-      showNotification('Failed to invite user', 'error');
+    showNotification("Failed to invite user", "error");
   }
 
-  const inviteGameButtonButton = document.getElementById('inviteGameButton');
+  const inviteGameButtonButton = document.getElementById("inviteGameButton");
   if (inviteGameButtonButton) inviteGameButtonButton.disabled = true;
 }
 
-  async function checkRequestGame() {
+async function checkRequestGame() {
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt || communication_user_id == -1) {
+    return;
+  }
 
-    const jwt = localStorage.getItem('jwt');
-    if (!jwt || communication_user_id == -1) {
-        return;
-    }
+  const payload = jwt.split(".")[1];
+  const decodedPayload = JSON.parse(atob(payload));
+  let my_id = decodedPayload.user_id; // Update user_id variable with the user ID extracted from the JWT
 
-    const payload = jwt.split('.')[1];
-    const decodedPayload = JSON.parse(atob(payload));
-    let my_id = decodedPayload.user_id; // Update user_id variable with the user ID extracted from the JWT
+  const responseGames = await fetch(`${BACKEND_URL}/api/games/`, {
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+  const games = await responseGames.json();
 
-    const responseGames = await fetch(`${BACKEND_URL}/api/games/`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    const games = await responseGames.json();
+  // console.log("--> 🎮🎮  my_id:", my_id, ", communication_user_id:", communication_user_id);
+  // console.log("--> 🎮 games:", games);
 
-    console.log("--> 🎮🎮  my_id:", my_id, ", communication_user_id:", communication_user_id);
-    console.log("--> 🎮 games:", games);
+  const game = games.find(
+    (game) =>
+      game.invitationStatus === "PENDING" &&
+      (game.invitee.id === my_id || game.inviter.id === my_id)
+  );
 
-    const game = games.find(
-      (game) =>
-        game.invitationStatus === "PENDING" &&
-        (game.invitee.id === my_id ||
-        game.inviter.id === my_id)
-    );
+  // console.log("--> 🎮 game:", game);
+  if (game) {
+    // console.log("game_ACCEPTED 🥶🥶🥶");
+    gameId = game.id;
 
-    console.log("--> 🎮 game:", game);
-    if(game){
-      console.log("game_ACCEPTED 🥶🥶🥶");
-      gameId = game.id;
+    const inviteGameButtonButton = document.getElementById("inviteGameButton");
+    if (inviteGameButtonButton) inviteGameButtonButton.disabled = true;
+  }
 
-      const inviteGameButtonButton = document.getElementById('inviteGameButton');
-      if (inviteGameButtonButton) inviteGameButtonButton.disabled = true;
-    }
+  // ACCEPTED game
+  const game_ACCEPTED = games.find(
+    (game) => game.invitee.id === my_id && game.invitationStatus === "ACCEPTED"
+  );
 
-    // ACCEPTED game
-    const game_ACCEPTED = games.find(
-      (game) =>
-        game.invitee.id === my_id &&
-        game.invitationStatus === "ACCEPTED"
-      );
+  if (game_ACCEPTED) {
+    // console.log("game_ACCEPTED 🥶🥶");
+    window.location.href = `/#game/${game_ACCEPTED.id}`;
+  }
 
-    if (game_ACCEPTED){
-      console.log("game_ACCEPTED 🥶🥶");
-      window.location.href = `/#game/${game_ACCEPTED.id}`;
-    }
+  // send notificacion
+  const game_pending = games.find(
+    (game) => game.invitee.id === my_id && game.invitationStatus === "PENDING"
+  );
 
-    // send notificacion
-    const game_pending = games.find(
-      (game) =>
-        game.invitee.id === my_id &&
-        game.invitationStatus === "PENDING"
-    );
-
-    if (game_pending)
-    {
-      console.log("game_pending 🥶");
-      const acceptGameButton = document.getElementById('acceptGameButton');
-      if (acceptGameButton) acceptGameButton.disabled = false;
-    }
+  if (game_pending) {
+    // console.log("game_pending 🥶");
+    const acceptGameButton = document.getElementById("acceptGameButton");
+    if (acceptGameButton) acceptGameButton.disabled = false;
+  }
 }
 
-  async function acceptGame() {
-
-    const jwt = localStorage.getItem('jwt');
-    if (!jwt) {
-        return;
-    }
-
-    if (gameId === "-1" && gameId === -1){
-      return
-    }
-
-    const result = await fetch(
-      `${BACKEND_URL}/api/games/${gameId}/accept_game/`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    sendAcceptedGameNotifications(user_id, UserName, communication_user_id, gameId);
-    console.log({ result: await result.json() });
-    // /game
-    window.location.href = `/#game/${gameId}`;
-
+async function acceptGame() {
+  const jwt = localStorage.getItem("jwt");
+  if (!jwt) {
+    return;
   }
 
+  if (gameId === "-1" && gameId === -1) {
+    return;
+  }
 
-  async function blockUser(userId) {
-
-    if (user_id < 0 || communication_user_id < 0){
-      return;
-    }
-
-    const jwt = localStorage.getItem('jwt');
-
-    const response = await fetch(`${BACKEND_URL}/api/users-blocks/block/`, {
-      method: 'POST',
+  const result = await fetch(
+    `${BACKEND_URL}/api/games/${gameId}/accept_game/`,
+    {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ blocked_user_id: communication_user_id }),
-    });
-
-    switchChannel(-1);
-    updateChannelList(channels);
-
-    if (response.ok) {
-      showNotification('User blocked successfully', 'success');
-    } else {
-      showNotification('Failed to block user', 'error');
     }
+  );
 
-    await blocks_users_frontend(jwt);
+  sendAcceptedGameNotifications(
+    user_id,
+    UserName,
+    communication_user_id,
+    gameId
+  );
+  // console.log({ result: await result.json() });
+  // /game
+  window.location.href = `/#game/${gameId}`;
+}
 
-    disconnectWebSocket(channel_now);
-    Chat_Update_js();
+async function blockUser(userId) {
+  if (user_id < 0 || communication_user_id < 0) {
+    return;
   }
 
-  async function disconnectWebSocket(check_channel_infucion) {
+  const jwt = localStorage.getItem("jwt");
 
-    // if (sockets[channel_now]) {
-    //   sockets[channel_now].close();
-    //   delete sockets[channel_now];
-    // }
-      // sockets[check_channel_infucion].close();
-      delete sockets[check_channel_infucion];
+  const response = await fetch(`${BACKEND_URL}/api/users-blocks/block/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify({ blocked_user_id: communication_user_id }),
+  });
 
-      console.log(">>> delete sockets[check_channel_infucion]:", sockets[check_channel_infucion]);
+  switchChannel(-1);
+  updateChannelList(channels);
+
+  if (response.ok) {
+    showNotification("User blocked successfully", "success");
+  } else {
+    showNotification("Failed to block user", "error");
   }
 
-  async function  blocks_users_frontend(jwt) {
+  await blocks_users_frontend(jwt);
 
-    const responseBlockUser = await fetch(`${BACKEND_URL}/api/users-blocks/blocked/`, {
+  disconnectWebSocket(channel_now);
+  Chat_Update_js();
+}
+
+async function disconnectWebSocket(check_channel_infucion) {
+  // if (sockets[channel_now]) {
+  //   sockets[channel_now].close();
+  //   delete sockets[channel_now];
+  // }
+  // sockets[check_channel_infucion].close();
+  delete sockets[check_channel_infucion];
+
+  // console.log(">>> delete sockets[check_channel_infucion]:", sockets[check_channel_infucion]);
+}
+
+async function blocks_users_frontend(jwt) {
+  const responseBlockUser = await fetch(
+    `${BACKEND_URL}/api/users-blocks/blocked/`,
+    {
       headers: { Authorization: `Bearer ${jwt}` },
-    });
-    blockUsersList = await responseBlockUser.json();
+    }
+  );
+  blockUsersList = await responseBlockUser.json();
 
+  const responseUsers = await fetch(`${BACKEND_URL}/api/users/`, {
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+  usersList = await responseUsers.json();
 
-    const responseUsers = await fetch(`${BACKEND_URL}/api/users/`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-    });
-    usersList = await responseUsers.json();
+  const listBlockContainer = document.getElementById("list-block");
 
-    const listBlockContainer = document.getElementById('list-block');
+  if (listBlockContainer) {
+    listBlockContainer.innerHTML = "";
 
-    if (listBlockContainer){
-      listBlockContainer.innerHTML = '';
+    blockUsersList.forEach((blockedUser) => {
+      const userDiv = document.createElement("div");
+      userDiv.className = "d-flex align-items-center mb-2";
 
-      blockUsersList.forEach((blockedUser) => {
-        const userDiv = document.createElement('div');
-        userDiv.className = 'd-flex align-items-center mb-2';
+      const userImage = document.createElement("img");
+      userImage.src = blockedUser.avatarImageURL;
+      userImage.alt = "User Image";
+      userImage.className = "rounded-circle mr-2";
+      userImage.width = 40;
+      userImage.height = 40;
 
-        const userImage = document.createElement('img');
-        userImage.src = blockedUser.avatarImageURL;
-        userImage.alt = 'User Image';
-        userImage.className = 'rounded-circle mr-2';
-        userImage.width = 40;
-        userImage.height = 40;
+      const userName = document.createElement("strong");
 
-        const userName = document.createElement('strong');
+      userName.textContent = blockedUser.username;
 
-        userName.textContent = blockedUser.username;
+      const unlockButton = document.createElement("button");
+      unlockButton.className = "btn btn-primary btn-sm ml-auto";
+      unlockButton.textContent = "to unlock";
+      unlockButton.addEventListener("click", () => unlockUser(blockedUser.id));
 
-        const unlockButton = document.createElement('button');
-        unlockButton.className = 'btn btn-primary btn-sm ml-auto';
-        unlockButton.textContent = 'to unlock';
-        unlockButton.addEventListener('click', () => unlockUser(blockedUser.id));
+      userDiv.appendChild(userImage);
+      userDiv.appendChild(userName);
+      userDiv.appendChild(unlockButton);
 
-        userDiv.appendChild(userImage);
-        userDiv.appendChild(userName);
-        userDiv.appendChild(unlockButton);
-
-        listBlockContainer.appendChild(userDiv);
+      listBlockContainer.appendChild(userDiv);
     });
   }
 }
 
 async function unlockUser(userId) {
-  const jwt = localStorage.getItem('jwt');
+  const jwt = localStorage.getItem("jwt");
 
   const response = await fetch(`${BACKEND_URL}/api/users-blocks/unblock/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${jwt}`,
     },
     body: JSON.stringify({ blocked_user_id: userId }),
   });
 
   if (response.ok) {
-    showNotification('User unlocked successfully', 'success');
+    showNotification("User unlocked successfully", "success");
     Chat_js(); // Refrescar la lista después de desbloquear
   } else {
-    showNotification('Failed to unlock user', 'error');
+    showNotification("Failed to unlock user", "error");
   }
 }
 
-
 function handleSendClick() {
-  const textarea = document.getElementById('messageTextarea');
+  const textarea = document.getElementById("messageTextarea");
 
-  if (!validateAndSanitizeInput(textarea.value)){
+  if (!validateAndSanitizeInput(textarea.value)) {
     return;
   }
 
-  if (textarea && sockets[channel_now]) { // Check if the current channel connection exists
-      const message = textarea.value;
-      if (message.trim() !== '') {
-          let info_send = {
-              "message": message,
-              "channel": channel_now,
-              "UserName": UserName,
-              "userDetails": myUser,
-          }
-          sockets[channel_now].send(JSON.stringify(info_send)); // Send message through the corresponding WebSocket
-          textarea.value = '';
-          addMessageToChat(info_send);
-      }
+  if (textarea && sockets[channel_now]) {
+    // Check if the current channel connection exists
+    const message = textarea.value;
+    if (message.trim() !== "") {
+      let info_send = {
+        message: message,
+        channel: channel_now,
+        UserName: UserName,
+        userDetails: myUser,
+      };
+      sockets[channel_now].send(JSON.stringify(info_send)); // Send message through the corresponding WebSocket
+      textarea.value = "";
+      addMessageToChat(info_send);
+    }
   }
 }
 
 async function addMessageToChat(message) {
-
   let block_users = await get_User_list_blockuser(user_id);
 
-  if ( block_users.some((id) =>  id === message.userDetails.id) ){
+  if (block_users.some((id) => id === message.userDetails.id)) {
     return;
   }
 
@@ -473,10 +488,10 @@ async function addMessageToChat(message) {
       const messageDiv = document.createElement("div");
       messageDiv.className = "mb-3 d-flex align-items-start";
 
-      const userImage = document.createElement('img');
+      const userImage = document.createElement("img");
       userImage.src = `${message.userDetails.avatarImageURL}`;
-      userImage.alt = 'User Image';
-      userImage.className = 'rounded-circle mr-2';
+      userImage.alt = "User Image";
+      userImage.className = "rounded-circle mr-2";
       userImage.width = 40;
       userImage.height = 40;
 
@@ -497,10 +512,8 @@ async function addMessageToChat(message) {
 
       // Scroll to the bottom of the message list
       messageList.scrollTop = messageList.scrollHeight;
-
     }
-  }
-  else{
+  } else {
     if (!isUserBlocked(message.userDetails.id)) {
       // showNotificationPopup(message.UserName, message.message);
       showNotificationPopup(message.UserName, "has sent you a message");
@@ -510,43 +523,47 @@ async function addMessageToChat(message) {
 }
 
 function isUserBlocked(userId) {
-  return blockUsersList.some(blockedUser => blockedUser.id === userId);
+  return blockUsersList.some((blockedUser) => blockedUser.id === userId);
 }
 
 function saveMessageToLocalStorage(message) {
-  let messages = JSON.parse(localStorage.getItem(`messages_channel_${message.channel}`)) || [];
+  let messages =
+    JSON.parse(localStorage.getItem(`messages_channel_${message.channel}`)) ||
+    [];
   messages.push(message);
-  localStorage.setItem(`messages_channel_${message.channel}`, JSON.stringify(messages));
+  localStorage.setItem(
+    `messages_channel_${message.channel}`,
+    JSON.stringify(messages)
+  );
 }
 
 function handleButtonClick() {
   const modal = document.getElementById("channelModal");
   const membersList = document.getElementById("channelMembers");
 
-  console.log("+++++ handleButtonClick:", modal);
+  // console.log("+++++ handleButtonClick:", modal);
   if (modal) {
-
-    console.log("-----> modal.style.display:", modal.style.display);
+    // console.log("-----> modal.style.display:", modal.style.display);
     modal.classList.remove("d-none");
     modal.classList.add("d-block");
-    console.log("-----> modal.style.display:", modal.style.display);
+    // console.log("-----> modal.style.display:", modal.style.display);
 
     fetch(`${BACKEND_URL}/api/users/`)
       .then((response) => response.json())
       .then((users) => {
         usersList = users;
-        membersList.innerHTML = ''; // Clear existing list item
-        users.forEach(user => {
-            if (user.username != UserName){
-              const listItem = document.createElement('option');
-              listItem.textContent = user.username;
-              listItem.value = user.id;
-              membersList.appendChild(listItem);
-            }
+        membersList.innerHTML = ""; // Clear existing list item
+        users.forEach((user) => {
+          if (user.username != UserName) {
+            const listItem = document.createElement("option");
+            listItem.textContent = user.username;
+            listItem.value = user.id;
+            membersList.appendChild(listItem);
+          }
         });
       })
       .catch((error) => {
-        console.log("Error fetching users:", error);
+        // console.log("Error fetching users:", error);
       });
   }
 
@@ -554,7 +571,7 @@ function handleButtonClick() {
   if (closeModalButton) {
     closeModalButton.addEventListener("click", () => {
       // modal.style.display = "none"; // Hide the modal
-      console.log("closeModalButton on");
+      // console.log("closeModalButton on");
       modal.classList.remove("d-block");
       modal.classList.add("d-none");
     });
@@ -563,12 +580,12 @@ function handleButtonClick() {
 
 // Function to update the channels list UI with a selector
 function updateChannelList(channels) {
-  const channelsDiv = document.getElementById('chanelsLists');
-  if (channelsDiv){
+  const channelsDiv = document.getElementById("chanelsLists");
+  if (channelsDiv) {
     // Clear previous options
-    channelsDiv.innerHTML = '';
+    channelsDiv.innerHTML = "";
 
-    const defaultValue = document.createElement('option');
+    const defaultValue = document.createElement("option");
     defaultValue.value = -1;
     defaultValue.textContent = "Select a person for messages";
     // channelsDropdown.appendChild(defaultValue);
@@ -576,77 +593,79 @@ function updateChannelList(channels) {
 
     // Add an option for each channel
     array_channels = channels;
-    channels.forEach(channel => {
+    channels.forEach((channel) => {
+      const isBlocked = channel.members.some((member) =>
+        blockUsersList.some((blockedUser) => blockedUser.id === member.id)
+      );
 
-      const isBlocked = channel.members.some(member =>
-        blockUsersList.some(blockedUser => blockedUser.id === member.id)
-    );
+      if (!isBlocked) {
+        const option_component = document.createElement("div");
+        option_component.className =
+          "d-flex align-items-center p-2 border-bottom chat-item";
+        option_component.style.cursor = "pointer";
 
-      if (!isBlocked){
-        const option_component = document.createElement('div');
-        option_component.className = 'd-flex align-items-center p-2 border-bottom chat-item';
-        option_component.style.cursor = 'pointer';
-
-        const option_img = document.createElement('img');
-        option_img.className = 'rounded-circle me-3';
+        const option_img = document.createElement("img");
+        option_img.className = "rounded-circle me-3";
         option_img.height = 40;
         option_img.width = 40;
 
-        const option_name = document.createElement('p');
-        option_name.className = 'mb-0';
+        const option_name = document.createElement("p");
+        option_name.className = "mb-0";
 
         option_component.value = channel.id;
 
         // Encuentra un miembro cuyo username sea diferente de UserName
-        const differentMember = channel.members.find(member => member.username !== UserName);
+        const differentMember = channel.members.find(
+          (member) => member.username !== UserName
+        );
         // Verifica si se encontró un miembro diferente
         if (differentMember) {
           // option.textContent = differentMember.username;
           option_name.textContent = differentMember.username;
           option_img.height = 40;
           option_img.src = differentMember.avatarImageURL;
-
         } else {
           option_name.textContent = "No disponible";
         }
-        let friend_status = showActiveFriends(myUser.friends, differentMember.id);
+        let friend_status = showActiveFriends(
+          myUser.friends,
+          differentMember.id
+        );
 
         option_component.appendChild(option_img);
         option_component.appendChild(option_name);
 
-        if (typeof(friend_status) === "boolean"){
-
-          const option_frind = document.createElement('p');
+        if (typeof friend_status === "boolean") {
+          const option_frind = document.createElement("p");
           option_frind.style.height = "20px";
           option_frind.style.width = "20px";
 
-          if (friend_status === true){
-            option_frind.className = 'mb-0 ms-3 rounded-circle bg-success';
-          }else{
-            option_frind.className = 'mb-0 ms-3 rounded-circle bg-secondary';
+          if (friend_status === true) {
+            option_frind.className = "mb-0 ms-3 rounded-circle bg-success";
+          } else {
+            option_frind.className = "mb-0 ms-3 rounded-circle bg-secondary";
           }
           option_component.appendChild(option_frind);
         }
 
         channelsDiv.appendChild(option_component);
 
-
-        option_component.addEventListener('click', () => switchChannel(channel.id));
+        option_component.addEventListener("click", () =>
+          switchChannel(channel.id)
+        );
 
         // Add hover effect using Bootstrap utility classes
-        option_component.addEventListener('mouseover', () => {
-            option_component.classList.add('bg-primary');
-            option_name.classList.add("text-white");
-          });
+        option_component.addEventListener("mouseover", () => {
+          option_component.classList.add("bg-primary");
+          option_name.classList.add("text-white");
+        });
 
-        option_component.addEventListener('mouseout', () => {
-            option_component.classList.remove('bg-primary');
-            option_name.classList.remove("text-white");
+        option_component.addEventListener("mouseout", () => {
+          option_component.classList.remove("bg-primary");
+          option_name.classList.remove("text-white");
         });
       }
-
     });
-
   }
 }
 
@@ -654,35 +673,40 @@ function switchChannel(newChannelId) {
   // Update the current channel
   channel_now = newChannelId;
 
-  console.log(" <<<<<<< channel_now:", channel_now);
+  // console.log(" <<<<<<< channel_now:", channel_now);
 
   // Clear the chat messages from the UI
 
-  const inviteGameButtonButton = document.getElementById('inviteGameButton');
-  const userButton = document.getElementById('usersRouteButton');
-  const blockButton = document.getElementById('blockUserButton');
-  const sendButton = document.getElementById('sendButton');
-  const messageTextarea = document.getElementById('messageTextarea');
-  const messageList = document.getElementById('messageList');
+  const inviteGameButtonButton = document.getElementById("inviteGameButton");
+  const userButton = document.getElementById("usersRouteButton");
+  const blockButton = document.getElementById("blockUserButton");
+  const sendButton = document.getElementById("sendButton");
+  const messageTextarea = document.getElementById("messageTextarea");
+  const messageList = document.getElementById("messageList");
 
-  if (!inviteGameButtonButton || !userButton || !blockButton || !sendButton || !messageTextarea || !messageList)
-  {
+  if (
+    !inviteGameButtonButton ||
+    !userButton ||
+    !blockButton ||
+    !sendButton ||
+    !messageTextarea ||
+    !messageList
+  ) {
     return;
   }
-  messageList.innerHTML = '';
+  messageList.innerHTML = "";
 
   let currentTournamentId = localStorage.getItem("currentTournamentId");
 
   if (newChannelId === -1) {
-
     // If no channel is selected, disable send functionality and close WebSocket
     if (sendButton) sendButton.disabled = true;
     if (userButton) userButton.disabled = true;
     if (blockButton) blockButton.disabled = true;
     if (inviteGameButtonButton) inviteGameButtonButton.disabled = true;
     if (messageTextarea) {
-        messageTextarea.disabled = true;
-        messageTextarea.placeholder = "Select a channel to send messages";
+      messageTextarea.disabled = true;
+      messageTextarea.placeholder = "Select a channel to send messages";
     }
 
     // Close any existing WebSocket connection
@@ -691,21 +715,19 @@ function switchChannel(newChannelId) {
       delete sockets[channel_now];
     }
 
-     // Update the channel title to reflect no channel is selected
-    const channelHeader = document.getElementById('channel-title');
+    // Update the channel title to reflect no channel is selected
+    const channelHeader = document.getElementById("channel-title");
     if (channelHeader) channelHeader.textContent = "No Channel Selected";
-
-  }
-  else{
-
+  } else {
     // Enable send functionality
     if (sendButton) sendButton.disabled = false;
     if (userButton) userButton.disabled = false;
     if (blockButton) blockButton.disabled = false;
-    if (inviteGameButtonButton && !currentTournamentId) inviteGameButtonButton.disabled = false;
+    if (inviteGameButtonButton && !currentTournamentId)
+      inviteGameButtonButton.disabled = false;
     if (messageTextarea) {
-        messageTextarea.disabled = false;
-        messageTextarea.placeholder = "Enter your message here...";
+      messageTextarea.disabled = false;
+      messageTextarea.placeholder = "Enter your message here...";
     }
 
     // Check if there's an existing WebSocket connection for the new channel
@@ -715,48 +737,48 @@ function switchChannel(newChannelId) {
     }
 
     for (let index = 0; index < array_channels.length; index++) {
-      if(array_channels[index].id ==newChannelId)
-      {
+      if (array_channels[index].id == newChannelId) {
         changeNameChanel(array_channels[index]);
       }
     }
 
     // Load messages from local storage
     loadMessagesFromLocalStorage(newChannelId);
-    console.log("--> checkRequestGame();");
+    // console.log("--> checkRequestGame();");
     checkRequestGame();
   }
 }
 
 function loadMessagesFromLocalStorage(channelId) {
-  const messages = JSON.parse(localStorage.getItem(`messages_channel_${channelId}`)) || [];
-  const messageList = document.getElementById('messageList');
+  const messages =
+    JSON.parse(localStorage.getItem(`messages_channel_${channelId}`)) || [];
+  const messageList = document.getElementById("messageList");
 
-  messages.forEach(message => {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'mb-3 d-flex align-items-start';
+  messages.forEach((message) => {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "mb-3 d-flex align-items-start";
 
-      const userImage = document.createElement('img');
-      userImage.src = `${message.userDetails.avatarImageURL}`;
-      userImage.alt = 'User Image';
-      userImage.className = 'rounded-circle mr-2';
-      userImage.width = 40;
-      userImage.height = 40;
+    const userImage = document.createElement("img");
+    userImage.src = `${message.userDetails.avatarImageURL}`;
+    userImage.alt = "User Image";
+    userImage.className = "rounded-circle mr-2";
+    userImage.width = 40;
+    userImage.height = 40;
 
-      const messageContent = document.createElement('div');
+    const messageContent = document.createElement("div");
 
-      const messageUsername = document.createElement('strong');
-      messageUsername.textContent = message.UserName;
-      const messageText = document.createElement('p');
-      messageText.textContent = message.message;
+    const messageUsername = document.createElement("strong");
+    messageUsername.textContent = message.UserName;
+    const messageText = document.createElement("p");
+    messageText.textContent = message.message;
 
-      messageContent.appendChild(messageUsername);
-      messageContent.appendChild(messageText);
+    messageContent.appendChild(messageUsername);
+    messageContent.appendChild(messageText);
 
-      messageDiv.appendChild(userImage);
-      messageDiv.appendChild(messageContent);
+    messageDiv.appendChild(userImage);
+    messageDiv.appendChild(messageContent);
 
-      messageList.appendChild(messageDiv);
+    messageList.appendChild(messageDiv);
   });
 
   // Scroll to the bottom of the message list
@@ -765,11 +787,10 @@ function loadMessagesFromLocalStorage(channelId) {
 
 // Function to obtain the JWT user ID
 export function getUserIdFromJWT() {
-
   // const jwt = getToken();
   const jwt = getToken();
 
-  if (!jwt){
+  if (!jwt) {
     return -1;
   }
 
@@ -783,20 +804,22 @@ async function getUserChannels(userId) {
   const response = await fetch(
     `${BACKEND_URL}/api/user-channels/${userId}/?format=json`
   );
-  console.log("response:", await response);
+  // console.log("response:", await response);
   const data = await response.json();
 
-  console.log("getUserChannels:", data);
+  // console.log("getUserChannels:", data);
   return data;
 }
 
 // async function getUserChannels_filter_blockuser(userId) {
 async function get_User_list_blockuser() {
- 
   // block list
-  const responseBlockUser = await fetch(`${BACKEND_URL}/api/users-blocks/blocked/`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
+  const responseBlockUser = await fetch(
+    `${BACKEND_URL}/api/users-blocks/blocked/`,
+    {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    }
+  );
   blockUsersList = await responseBlockUser.json();
 
   let blockUsersList_id = blockUsersList.map((Block_user) => Block_user.id);
@@ -813,12 +836,14 @@ function changeNameChanel(channel) {
     );
     channel_title = differentMember.username;
     communication_user_id = differentMember.id;
-  }
-  else
-  {
+  } else {
     // channel_title = channel.name;
-    channel_title = channel.members.find(member => member.username !== UserName).username;
-    communication_user_id = channel.members.find(member => member.username !== UserName).id;
+    channel_title = channel.members.find(
+      (member) => member.username !== UserName
+    ).username;
+    communication_user_id = channel.members.find(
+      (member) => member.username !== UserName
+    ).id;
   }
 
   // Update the header with the selected channel's name
@@ -838,8 +863,8 @@ function createWebSocketConnection(channelId) {
   const jwt = localStorage.getItem("jwt");
   const ws = new WebSocket(`${WS_URL}/ws/chat/${channelId}/?token=${jwt}`);
   ws.addEventListener("message", (event) => {
-      const message = JSON.parse(event.data);
-      addMessageToChat(message);
+    const message = JSON.parse(event.data);
+    addMessageToChat(message);
   });
   ws.addEventListener("close", () => {
     delete sockets[channelId];
@@ -848,7 +873,6 @@ function createWebSocketConnection(channelId) {
 }
 
 function handleSaveChannelClick() {
-
   let selectedOptions =
     document.getElementById("channelMembers").selectedOptions;
   let selectedUsersMember = Array.from(selectedOptions).map((option) =>
@@ -888,7 +912,7 @@ function handleSaveChannelClick() {
   // Perform POST request
   fetch(url, requestOptions)
     .then((response) => response.json())
-    .then( async (data) => {
+    .then(async (data) => {
       if (data.name) {
         // Verify that the response status is 200 or 201.
         await Chat_Update_js();
@@ -897,7 +921,11 @@ function handleSaveChannelClick() {
         getUserChannels(user_id).then(updateChannelList); // Asume que user_id es global
         // getUserChannels_filter_blockuser(user_id).then(updateChannelList); // Asume que user_id es global
         // sendChannelCreatedMessage
-        sendChannelCreatedNotifications(user_id, UserName, selectedUsersMember[0])
+        sendChannelCreatedNotifications(
+          user_id,
+          UserName,
+          selectedUsersMember[0]
+        );
       } else {
         showNotification("Error there is already a chat", "error");
       }
@@ -906,7 +934,7 @@ function handleSaveChannelClick() {
       const modal = document.getElementById("channelModal");
       if (modal) {
         // modal.style.display = "none";
-        console.log("------>>> style.display");
+        // console.log("------>>> style.display");
         modal.classList.remove("d-block");
         modal.classList.add("d-none");
       }

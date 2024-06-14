@@ -11,7 +11,10 @@ import { BACKEND_URL } from "../../components/wcGlobal.js";
 // Function to log in
 export function loginUser(username, password) {
   // validateAndSanitizeInput
-  if (!validateAndSanitizeInput(username) || !validateAndSanitizeInput(password)){
+  if (
+    !validateAndSanitizeInput(username) ||
+    !validateAndSanitizeInput(password)
+  ) {
     return;
   }
 
@@ -42,6 +45,6 @@ export function loginUser(username, password) {
       }, 500);
     })
     .catch((error) => {
-      console.log("Error:", error);
+      // console.log("Error:", error);
     });
 }

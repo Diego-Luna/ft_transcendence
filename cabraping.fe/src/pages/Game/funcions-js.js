@@ -3,7 +3,6 @@ import { getToken } from "../../utils/get-token.js";
 import { getHash } from "../../utils/getHash.js";
 import { Send_data_bacnd_the_winner } from "./tournament-logic.js";
 
-
 export async function Game_js() {
   const jwt = getToken();
   if (!jwt) {
@@ -24,10 +23,9 @@ export async function Game_js() {
     headers: { Authorization: `Bearer ${jwt}` },
   });
   const game = await responseGame.json();
-  console.log(" 👨‍⚕️👨‍⚕️👨‍⚕️ game:", game);
+  // console.log(" 👨‍⚕️👨‍⚕️👨‍⚕️ game:", game);
 
-  if (!game.playMode)
-  {
+  if (!game.playMode) {
     window.location.replace("/#");
     return;
   }
@@ -89,7 +87,7 @@ export async function Game_js() {
   };
 
   gameSocket.onerror = function (error) {
-    console.log(`WebSocket error: ${error.message}`);
+    // console.log(`WebSocket error: ${error.message}`);
   };
 
   /**
@@ -274,8 +272,12 @@ export async function Game_js() {
       const result = response.json;
 
       // Diego - save data in the banckend
-      setTimeout( async () =>  {
-        await Send_data_bacnd_the_winner(game.inviter.id, game.invitee.id, winnerId);
+      setTimeout(async () => {
+        await Send_data_bacnd_the_winner(
+          game.inviter.id,
+          game.invitee.id,
+          winnerId
+        );
       }, Math.floor(Math.random() * 300));
       // Diego - sen the winner
 

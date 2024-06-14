@@ -24,10 +24,14 @@ export async function Header_html() {
 
     myUser = await responseMyUser.json();
 
-    if ( !responseMyUser.ok || myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
+    if (
+      !responseMyUser.ok ||
+      myUser.code === "user_not_found" ||
+      myUser.code === "token_not_valid"
+    ) {
       window.location.replace("/#logout");
     }
-
+    /*
     // Handle user notification
     const userNotificationSocket = new WebSocket(
       `${WS_URL}/ws/users/${myUser.id}/?token=${jwt}`
@@ -60,15 +64,16 @@ export async function Header_html() {
 
     userNotificationSocket.onclose = function (event) {
       if (event.wasClean) {
-        console.log(`Disconnected, code=${event.code}, reason=${event.reason}`);
+        // console.log(`Disconnected, code=${event.code}, reason=${event.reason}`);
       } else {
-        console.log("Connection died");
+        // console.log("Connection died");
       }
     };
 
     userNotificationSocket.onerror = function (error) {
       console.log(`WebSocket error: ${error.message}`);
     };
+    */
   }
 
   const view = `
@@ -94,7 +99,9 @@ export async function Header_html() {
             <li class="nav-item"><a class="nav-link" href="#tournament">Tournament</a></li>
             <li class="nav-item"><a class="nav-link" href="#stats">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link" href="#profile">Profile</a></li>
-          ` : ""}
+          `
+              : ""
+          }
         </ul>
       </div>
     </nav>
@@ -104,9 +111,7 @@ export async function Header_html() {
         isAuthenticated
           ? `
         <div class="d-flex gap-4">
-          <div id="user-notification">
-            <!-- -->
-          </div>
+    
 
           <a href="/#user" class="me-3 text-decoration-none text-dark">
             <b>${myUser.username}</b>

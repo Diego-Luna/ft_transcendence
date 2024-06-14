@@ -105,9 +105,9 @@ export async function FriendsRender() {
 
       const hideInviteButton = Boolean(unfinishedGame);
 
-      console.log("> myUserData.friends:", myUserData.friends, friend.id);
-      console.log("> friend.id:", friend.id);
-      console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
+      // console.log("> myUserData.friends:", myUserData.friends, friend.id);
+      // console.log("> friend.id:", friend.id);
+      // console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
       let friendActive = showActiveFriends(myUserData.friends, friend.id);
       let HTML_friendActive = "";
 
@@ -180,7 +180,6 @@ export async function FriendsRender() {
       FriendRequestsRender();
     });
   });
-
 }
 
 export async function FriendRequestsRender() {
