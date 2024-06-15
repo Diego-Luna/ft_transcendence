@@ -30,7 +30,6 @@ urlpatterns = [
 
     #path('api/tournaments/<int:tournament_id>/set_ready/', TournamentViewSet.set_ready, name='set_ready'), # rachel
 
-    
     path('api/tournaments/<int:pk>/addparticipant/', TournamentViewSet.as_view({'post': 'add_participant'}), name='add_participant'),
     path('api/participants/<int:pk>/update_accepted_invite/', ParticipantViewSet.as_view({'post': 'update_accepted_invite'}), name='update_accepted_invite'),
 

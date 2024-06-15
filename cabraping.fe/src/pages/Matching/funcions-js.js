@@ -55,7 +55,7 @@ export async function Matching_js() {
 
         button.addEventListener('click', async () => {
             sendWaitMatchedMessage(userId);
-            console.log("Wait for match message sent");
+            // console.log("Wait for match message sent");
 
             // Mostrar mensaje de búsqueda
             statusDiv.innerHTML = '<p class="text-info">Looking for a match...</p>';

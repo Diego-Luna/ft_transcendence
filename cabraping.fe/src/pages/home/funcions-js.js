@@ -39,10 +39,10 @@ async function redirect42() {
       // Redirect the browser to the constructed API URL
       window.location.href = api_url;
     } else {
-      console.log("Failed to fetch config.");
+      // console.log("Failed to fetch config.");
     }
   } catch (error) {
-    console.log("Error fetching config:", error);
+    // console.log("Error fetching config:", error);
     // Handle error (e.g., show error message or fallback behavior)
   }
 }

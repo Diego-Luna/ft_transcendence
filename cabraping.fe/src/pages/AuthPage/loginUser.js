@@ -42,6 +42,6 @@ export function loginUser(username, password) {
       }, 500);
     })
     .catch((error) => {
-      console.log("Error:", error);
+      //console.log("Error:", error);
     });
 }

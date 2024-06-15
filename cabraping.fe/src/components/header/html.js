@@ -22,53 +22,60 @@ export async function Header_html() {
       headers: { Authorization: `Bearer ${jwt}` },
     });
 
+    if (!responseMyUser.ok)
+    {
+      localStorage.clear();
+      window.location.href = `/#`;
+      return;
+    }
+
     myUser = await responseMyUser.json();
 
     if ( !responseMyUser.ok || myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
       window.location.replace("/#logout");
     }
 
-    // Handle user notification
-    const userNotificationSocket = new WebSocket(
-      `${WS_URL}/ws/users/${myUser.id}/?token=${jwt}`
-    );
+  //   // Handle user notification
+  //   const userNotificationSocket = new WebSocket(
+  //     `${WS_URL}/ws/users/${myUser.id}/?token=${jwt}`
+  //   );
 
-    userNotificationSocket.onopen = function (event) {
-      // console.log("User notification socket connected");
-    };
+  //   userNotificationSocket.onopen = function (event) {
+  //     // console.log("User notification socket connected");
+  //   };
 
-    userNotificationSocket.onmessage = function (event) {
-      const data = JSON.parse(event.data);
-      // console.log("Message from server ", data);
+  //   userNotificationSocket.onmessage = function (event) {
+  //     const data = JSON.parse(event.data);
+  //     // console.log("Message from server ", data);
 
-      const userNotificationElement =
-        document.getElementById("user-notification");
+  //     const userNotificationElement =
+  //       document.getElementById("user-notification");
 
-      if (data.status === "GAME_ACCEPTED" || data.status === "GAME_INVITED") {
-        userNotificationElement.innerHTML = `
-        <div class="d-flex gap-2">
-          <span>${data.message}</span>
-          <a href="/#game/${data.game_id}" class="btn btn-sm btn-secondary">
-            Go to the game
-          </a>
-        </div>
-        `;
-      } else {
-        userNotificationElement.innerText = data.message;
-      }
-    };
+  //     if (data.status === "GAME_ACCEPTED" || data.status === "GAME_INVITED") {
+  //       userNotificationElement.innerHTML = `
+  //       <div class="d-flex gap-2">
+  //         <span>${data.message}</span>
+  //         <a href="/#game/${data.game_id}" class="btn btn-sm btn-secondary">
+  //           Go to the game
+  //         </a>
+  //       </div>
+  //       `;
+  //     } else {
+  //       userNotificationElement.innerText = data.message;
+  //     }
+  //   };
 
-    userNotificationSocket.onclose = function (event) {
-      if (event.wasClean) {
-        console.log(`Disconnected, code=${event.code}, reason=${event.reason}`);
-      } else {
-        console.log("Connection died");
-      }
-    };
+  //   userNotificationSocket.onclose = function (event) {
+  //     if (event.wasClean) {
+  //       console.log(`Disconnected, code=${event.code}, reason=${event.reason}`);
+  //     } else {
+  //       console.log("Connection died");
+  //     }
+  //   };
 
-    userNotificationSocket.onerror = function (error) {
-      console.log(`WebSocket error: ${error.message}`);
-    };
+  //   userNotificationSocket.onerror = function (error) {
+  //     console.log(`WebSocket error: ${error.message}`);
+  //   };
   }
 
   const view = `

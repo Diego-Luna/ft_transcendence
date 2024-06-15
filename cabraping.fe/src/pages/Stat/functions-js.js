@@ -28,7 +28,7 @@ export async function Stat_js() {
 
     setupNavigation();
   } catch (error) {
-    console.log('Error fetching data:', error);
+    // console.log('Error fetching data:', error);
   }
 }
 
@@ -165,7 +165,7 @@ async function fetchData(url, options = {}) {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.log(`Failed to fetch ${url}: ${error}`);
+    // console.log(`Failed to fetch ${url}: ${error}`);
     return null;
   }
 }

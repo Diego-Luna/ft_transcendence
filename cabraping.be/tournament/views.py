@@ -11,6 +11,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from users.models import CustomUser
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.exceptions import ValidationError
+
 
 
 from django.http import JsonResponse
@@ -327,3 +329,11 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_200_OK)

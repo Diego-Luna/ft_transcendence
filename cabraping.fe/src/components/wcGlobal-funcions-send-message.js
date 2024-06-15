@@ -4,7 +4,7 @@ import { WSsocket, BACKEND_URL, WS_URL, connectWebSocketGlobal } from "./wcGloba
 // Función para enviar un mensaje específico al WebSocket
 export function sendAcceptedGameNotifications(userId, userName, destUserId, game_id) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -21,7 +21,7 @@ export function sendAcceptedGameNotifications(userId, userName, destUserId, game
 
 export function sendTournamentNotifications(userId, userName, destUserId, tournament_id, tournament_name) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.error('WebSocket is not connected');
+        //console.error('WebSocket is not connected');
         return;
     }
 
@@ -41,7 +41,7 @@ export function sendTournamentNotifications(userId, userName, destUserId, tourna
 // Función para enviar un mensaje específico al WebSocket
 export function sendFriendRequestNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -58,7 +58,7 @@ export function sendFriendRequestNotifications(userId, userName, destUserId) {
 
 export function sendUpdateList_of_tournament_Notifications(userId, userName, destUserId, text) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -76,7 +76,7 @@ export function sendUpdateList_of_tournament_Notifications(userId, userName, des
 // Función para enviar un mensaje específico al WebSocket
 export function sendFriendAcceptdNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -93,7 +93,7 @@ export function sendFriendAcceptdNotifications(userId, userName, destUserId) {
 
 export function sendFriendDeletedNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -111,7 +111,7 @@ export function sendFriendDeletedNotifications(userId, userName, destUserId) {
 // Function to join the matchmaking queue
 export function joinMatchmakingQueue(userId, userName) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -127,7 +127,7 @@ export function joinMatchmakingQueue(userId, userName) {
 // Función para enviar el mensaje de espera de coincidencia
 export function sendWaitMatchedMessage(userId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -142,7 +142,7 @@ export function sendWaitMatchedMessage(userId) {
 
 export function sendDeleteMatchedMessage(userId, otherId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -184,7 +184,7 @@ async function hasPendingOrAcceptedGames(userId) {
     });
 
     if (!response.ok) {
-        console.error('Error fetching games:', response.statusText);
+        //console.error('Error fetching games:', response.statusText);
         return false;
     }
 
@@ -198,12 +198,12 @@ async function hasPendingOrAcceptedGames(userId) {
 // Función para manejar el evento "update_waiting_list"
 export async function handleUpdateWaitingList(message, userId, myUser) {
     const waitingIds = message.waiting_ids;
-    console.log("---> Matching: waitingIds:", waitingIds, ",userId:", userId, ", myUser:", myUser);
+    //console.log("---> Matching: waitingIds:", waitingIds, ",userId:", userId, ", myUser:", myUser);
     if (waitingIds.length >= 2) {
         for (let i = 1; i < waitingIds.length; i += 2) {
             if (waitingIds[i] === userId) {
 
-                console.log("---> Matching: sendGameInitiate_Waiting:", userId, waitingIds[i - 1]);
+                //console.log("---> Matching: sendGameInitiate_Waiting:", userId, waitingIds[i - 1]);
 
                 // let status_id_1 = await hasPendingOrAcceptedGames(userId);
                 // let status_id_2 = await hasPendingOrAcceptedGames(waitingIds[i - 1]);
@@ -216,9 +216,9 @@ export async function handleUpdateWaitingList(message, userId, myUser) {
 
                 // let status = await sendGameInitiate_Waiting(userId, waitingIds[i - 1]);
                 let status = await sendGameInitiate_Waiting(userId, waitingIds[i - 1]);
-                console.log("<--- Matching: status:", status);
+                //console.log("<--- Matching: status:", status);
                 if (status.ok) {
-                    console.log("---> Matching: Se mando la invitacion a l juego:", userId, myUser.username, waitingIds[i - 1], "system");
+                    //console.log("---> Matching: Se mando la invitacion a l juego:", userId, myUser.username, waitingIds[i - 1], "system");
                     sendGameInviteNotifications(userId, myUser.username, waitingIds[i - 1], "system");
                 //     // WSsocket.close();
                 //     // connectWebSocketGlobal()
@@ -233,7 +233,7 @@ export async function handleUpdateWaitingList(message, userId, myUser) {
 // Función para enviar un mensaje específico al WebSocket
 export function sendChannelCreatedNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        // console.log('WebSocket is not connected');
         return;
     }
 
@@ -251,7 +251,7 @@ export function sendChannelCreatedNotifications(userId, userName, destUserId) {
 // Función para enviar un mensaje específico al WebSocket Diego
 export function sendGameInviteNotifications(userId, userName, destUserId, text) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -263,8 +263,8 @@ export function sendGameInviteNotifications(userId, userName, destUserId, text) 
         dest_user_id: String(destUserId)
     };
 
-    console.log("???");
-    console.log("sendGameInviteNotifications",message);
+    //console.log("???");
+    //console.log("sendGameInviteNotifications",message);
 
     WSsocket.send(JSON.stringify(message));
 }
@@ -272,7 +272,7 @@ export function sendGameInviteNotifications(userId, userName, destUserId, text) 
 // Función para enviar un mensaje específico al WebSocket
 export function sendGameInviteTournamentNotifications(userId, userName, destUserId, text) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -290,7 +290,7 @@ export function sendGameInviteTournamentNotifications(userId, userName, destUser
 // Función para enviar un mensaje específico al WebSocket
 export function sendGameAcceptTournamentNotifications(userId, userName, destUserId, text) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -308,7 +308,7 @@ export function sendGameAcceptTournamentNotifications(userId, userName, destUser
 // Función para enviar un mensaje específico al WebSocket
 export function sendGameCancelTournamentNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 
@@ -326,7 +326,7 @@ export function sendGameCancelTournamentNotifications(userId, userName, destUser
 // Función para enviar un mensaje específico al WebSocket
 export function sendWinnerOfGameTournamentNotifications(userId, userName, text) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
-        console.log('WebSocket is not connected');
+        //console.log('WebSocket is not connected');
         return;
     }
 

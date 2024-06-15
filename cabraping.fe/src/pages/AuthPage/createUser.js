@@ -34,8 +34,15 @@ export function createUser(email, password) {
         }
     })
     .then(data => {
+        if(data.error)
+        {
+            showNotification("Incorrect username or password", "error");
+        }
+        else
+        {
+            showNotification("User created successfully", "success");
+        }
         // Assuming data contains the response for a successful user creation
-        showNotification("User created successfully", "success");
     })
     .catch((error) => {
         // Catch any error from the server response or the fetch operation itself

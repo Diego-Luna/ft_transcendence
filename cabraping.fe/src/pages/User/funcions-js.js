@@ -27,7 +27,7 @@ export async function User_js() {
 
   const form = document.getElementById('data-info');
   if (form) {
-    console.log("-> form is valid");
+    // console.log("-> form is valid");
     form.addEventListener('submit', FormSendData);
   }
 }
@@ -40,7 +40,7 @@ async function updateInfo() {
     headers: { Authorization: `Bearer ${jwt}` },
   });
   const users = await responseUsers.json();
-  console.log("---> All users:", users);
+  // console.log("---> All users:", users);
 
   if (userId) {
     myUser = users.find(user => user.id === parseInt(userId));
@@ -105,9 +105,9 @@ function FormSendData(event) {
     },
   };
 
-  console.log("-> formData");
-  console.log(BACKEND_URL + '/api/user/update/' + myUser.id + "/");
-  console.log(formData);
+  // console.log("-> formData");
+  // console.log(BACKEND_URL + '/api/user/update/' + myUser.id + "/");
+  // console.log(formData);
 
   fetch(BACKEND_URL + '/api/user/update/' + myUser.id + "/", options)
     .then(response => {
@@ -119,12 +119,15 @@ function FormSendData(event) {
       return response.json();
     })
     .then(data => {
-      console.log('Success:', data);
-      showNotification("User successfully updated", "success");
+      // console.log('Success:', data);
+      if (data.error)
+        showNotification("This name is used", "error");
+      else
+        showNotification("User successfully updated", "success");
       updateInfo();
     })
     .catch((error) => {
-      console.log('Error:', error);
+      // console.log('Error:', error);
       showNotification("Error updating user! " + error.message, "error");
     });
 }
@@ -141,8 +144,8 @@ async function deleteUser(username) {
     });
 
     if (response.status === 204) {
-        console.log(`User ${username} deleted successfully`);
+        // console.log(`User ${username} deleted successfully`);
     } else {
-        console.error(`Failed to delete user ${username}`);
+        // console.error(`Failed to delete user ${username}`);
     }
 }

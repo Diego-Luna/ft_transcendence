@@ -11,7 +11,7 @@ export async function Cancel_a_Game(gameId) {
 
     gameId = Number(gameId)
 
-    console.log("🐹🐹 Cancel_a_Game:", gameId);
+    // console.log("🐹🐹 Cancel_a_Game:", gameId);
 
     const responseGame = await fetch(`${BACKEND_URL}/api/games/`, {
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -20,14 +20,14 @@ export async function Cancel_a_Game(gameId) {
     let existe = await responseGame.json();
 
 
-    console.log("🐹🐹 existe:", existe);
+    // console.log("🐹🐹 existe:", existe);
 
     if (!(existe.some((game) => game.id === gameId)))
     {
         return null;
     }
 
-    console.log("🐹🐹 yes");
+    // console.log("🐹🐹 yes");
     const response = await fetch(
         `${BACKEND_URL}/api/games/${gameId}/`,
         {
@@ -59,7 +59,7 @@ export async function Cancel_a_Game(gameId) {
     }
 
     return send_notificaque;
-    console.log("🐹🐹 yes");
+    // console.log("🐹🐹 yes");
 }
 
 
@@ -84,10 +84,10 @@ export async function checkAcceptedGames(userId) {
         );
 
         if (acceptedGame) {
-            console.log("Accepted game found:", acceptedGame);
+            // console.log("Accepted game found:", acceptedGame);
             return acceptedGame
         } else {
-            console.log("No accepted games found for user:", userId);
+            // console.log("No accepted games found for user:", userId);
             return null
         }
 

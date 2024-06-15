@@ -43,9 +43,9 @@ export async function Check_if_im_the_creator_to_reload() {
 
     if (pendingTournament) {
 
-        console.log("--> pendingTournament:", pendingTournament);
+        // console.log("--> pendingTournament:", pendingTournament);
         const isCreator = pendingTournament.participants[0].user.id === userId;
-        console.log("---> isCreator:", isCreator);
+        // console.log("---> isCreator:", isCreator);
         if (isCreator) {
             await loadTournamentData(pendingTournament.id);
         } 
@@ -58,8 +58,9 @@ async function TournamentInit() {
     if (!jwt)
     {
       window.location.replace("/#");
+      return;
     }
-    console.log("Initializing Tournament Page");
+    // console.log("Initializing Tournament Page");
 
     WS_check_the_torunament_pending();
 
@@ -71,24 +72,24 @@ async function TournamentInit() {
 
     if (pendingTournament) {
 
-        console.log("--> pendingTournament:", pendingTournament);
+        // console.log("--> pendingTournament:", pendingTournament);
         const isCreator = pendingTournament.participants[0].user.id === userId;
-        console.log("---> isCreator:", isCreator);
+        // console.log("---> isCreator:", isCreator);
         if (isCreator) {
-            console.log("Found pending tournament as creator:", pendingTournament);
+            // console.log("Found pending tournament as creator:", pendingTournament);
             localStorage.setItem('currentTournamentId', pendingTournament.id);
             await loadTournamentData(pendingTournament.id);
             connectTournamentWebSocket(pendingTournament.id);
             checkGoToWaitingAreaButton(pendingTournament);
             checkCancelCreateButton(pendingTournament);
         } else {
-            console.log("Found pending tournament as participant:", pendingTournament);
+            // console.log("Found pending tournament as participant:", pendingTournament);
             window.location.href = `/#waitroom/${pendingTournament.id}`;
             return;
         }
     }
     if (procesTournament) {
-        console.log("--> procesTournament:", procesTournament);
+        // console.log("--> procesTournament:", procesTournament);
         window.location.href = `/#waitroom/${procesTournament.id}`;
         return;
     }
@@ -96,17 +97,17 @@ async function TournamentInit() {
     const tournamentForm = document.getElementById('tournamentForm');
     if (tournamentForm) {
         tournamentForm.addEventListener('submit', handleCreateTournament);
-        console.log("Event listener added to tournament form");
+        // console.log("Event listener added to tournament form");
     } else {
-        console.error("Tournament form not found");
+        // console.error("Tournament form not found");
     }
 
     const addParticipantButton = document.getElementById('addParticipantButton');
     if (addParticipantButton) {
         addParticipantButton.addEventListener('click', checkAddParticipantButton);
-        console.log("Event listener added to add participant button");
+        // console.log("Event listener added to add participant button");
     } else {
-        console.error("Add participant button not found");
+        // console.error("Add participant button not found");
     }
 
     const participantNameInput = document.getElementById('participantNameInput');
@@ -116,17 +117,17 @@ async function TournamentInit() {
                 checkAddParticipantButton(event);
             }
         });
-        console.log("Event listener added for enter key on participant name input");
+        // console.log("Event listener added for enter key on participant name input");
     } else {
-        console.error("Participant name input not found");
+        // console.error("Participant name input not found");
     }
 
     const cancelCreateButton = document.getElementById('cancelCreateButton');
     if (cancelCreateButton) {
         checkCancelCreateButton(pendingTournament);
-        console.log("Event listener added to cancel create button");
+        // console.log("Event listener added to cancel create button");
     } else {
-        console.error("Cancel create button not found");
+        // console.error("Cancel create button not found");
     }
 }
 
@@ -146,11 +147,11 @@ export async function fetchTournaments() {
         if (response.ok) {
             return await response.json();
         } else {
-            console.error('Failed to fetch tournaments');
+            // console.error('Failed to fetch tournaments');
             return [];
         }
     } catch (error) {
-        console.error('Error fetching tournaments:', error);
+        // console.error('Error fetching tournaments:', error);
         return [];
     }
 }
@@ -171,7 +172,7 @@ async function loadTournamentData(tournamentId) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("🥶 loadTournamentData:", data);
+            // console.log("🥶 loadTournamentData:", data);
 
             localStorage.setItem('currentTournamentId', data.id);
 
@@ -198,12 +199,12 @@ async function loadTournamentData(tournamentId) {
             let i = 0;
             data.participants.forEach(participant => {
                 const listItem = document.createElement('li');
-                console.log("-------> participant:", participant);
+                // console.log("-------> participant:", participant);
                 if (participant.status) {
                     listItem.textContent = `${participant.user.username} - ${participant.status}`;
                 } else{
-                    console.log("-------> participant else:", participant);
-                    console.log("-------> participant participant.accepted_invite:", participant.accepted_invite);
+                    // console.log("-------> participant else:", participant);
+                    // console.log("-------> participant participant.accepted_invite:", participant.accepted_invite);
                     if (i === 0)
                         listItem.textContent = `You (Creator)`;
                     else {
@@ -229,10 +230,10 @@ async function loadTournamentData(tournamentId) {
                     number_invites = i;
                 }
 
-                console.log("addParticipantButton.style.display:", addParticipantButton.style.display);
+                // console.log("addParticipantButton.style.display:", addParticipantButton.style.display);
                 addParticipantButton.style.display = 'none';
                 } else{
-                console.log("addParticipantButton.style.display:", addParticipantButton.style.display);
+                // console.log("addParticipantButton.style.display:", addParticipantButton.style.display);
                 addParticipantButton.style.display = 'inline';
             }
 
@@ -240,18 +241,19 @@ async function loadTournamentData(tournamentId) {
             addParticipantButton.disabled = false;
 
             checkGoToWaitingAreaButton(data);
-            console.log("🥶 loadTournamentData: Tournament data loaded successfully from backend");
+            // console.log("🥶 loadTournamentData: Tournament data loaded successfully from backend");
         } else {
-            console.error('Failed to load tournament data from backend');
+            // console.error('Failed to load tournament data from backend');
         }
     } catch (error) {
-        console.error('Error loading tournament data:', error);
+        // console.error('Error loading tournament data:', error);
     }
 
 }
 
 // Establecer conexión WebSocket
-export function connectTournamentWebSocket(tournamentId) {
+// export function connectTournamentWebSocket(tournamentId) {
+export async function connectTournamentWebSocket(tournamentId) {
     if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState === WebSocket.CLOSED) {
         let jwt = getToken();
         // const wsUrl = `ws://localhost:8000/ws/tournament/${tournamentId}/?token=${jwt}`;
@@ -259,7 +261,7 @@ export function connectTournamentWebSocket(tournamentId) {
         const tournamentSocket = new WebSocket(wsUrl);
 
         tournamentSocket.onopen = function() {
-            console.log(`WebSocket connection opened for tournament ${tournamentId}`);
+            // console.log(`WebSocket connection opened for tournament ${tournamentId}`);
             activeWebSockets[tournamentId] = tournamentSocket;
         };
 
@@ -269,14 +271,14 @@ export function connectTournamentWebSocket(tournamentId) {
         };
 
         tournamentSocket.onclose = function(event) {
-            console.log(`WebSocket connection closed for tournament ${tournamentId}:`, event);
+            // console.log(`WebSocket connection closed for tournament ${tournamentId}:`, event);
             delete activeWebSockets[tournamentId];
         };
 
         tournamentSocket.onerror = function(error) {
-            console.error(`WebSocket error for tournament ${tournamentId}:`, error);
+            // console.error(`WebSocket error for tournament ${tournamentId}:`, error);
         };
-        //activeWebSockets[tournamentId] = tournamentSocket;
+        activeWebSockets[tournamentId] = tournamentSocket;
     }
 }
 
@@ -285,21 +287,21 @@ async function handleAddParticipant(e) {
 
     const participantName = document.getElementById('participantNameInput').value.trim();
 
-    console.log("🪵 participantName:", participantName);
+    // console.log("🪵 participantName:", participantName);
     if (!participantName) {
         showNotification('Participant name cannot be empty.');
         return;
     }
 
     const currentUser = localStorage.getItem('username');
-    console.log("🪵 currentUser:", currentUser);
+    // console.log("🪵 currentUser:", currentUser);
     if (participantName === currentUser) {
         showNotification('You cannot invite yourself to the party. Have some manners!');
         return;
     }
 
     const tournamentId = localStorage.getItem('currentTournamentId');
-    console.log("🪵 tournamentId:", tournamentId)
+    // console.log("🪵 tournamentId:", tournamentId)
     if (!tournamentId) {
         showNotification('No tournament ID found. Please create a tournament first.');
         return;
@@ -317,12 +319,12 @@ async function handleAddParticipant(e) {
 
 
 
-    console.log("🪵 isOnline:", isOnline)
+    // console.log("🪵 isOnline:", isOnline)
     if (isOnline === null) {
         showNotification("User not found. Please double-check their username.");
     } else if (isOnline) {
         const participantId = await getUserIdByUsername(participantName, tournamentId);
-        console.log("🪵 participantId:", participantId)
+        // console.log("🪵 participantId:", participantId)
 
         if (participantId) {
 
@@ -342,19 +344,19 @@ async function handleAddParticipant(e) {
 
             sendTournamentInvitation(tournamentId, participantName, participantId);
 
-            console.log("🪵🪵🪵 participantName:", participantName);
+            // console.log("🪵🪵🪵 participantName:", participantName);
             await loadTournamentData(tournamentId);
         } else {
             showNotification("Failed to get participant ID.");
         }
     } else {
         showNotification("Participant is not online.");
-        console.log("Participant is not online.");
+        // console.log("Participant is not online.");
     }
     document.getElementById('participantNameInput').value = ''; // Clear input after adding
     // saveTournamentData();
 
-    console.log("🪵 🪵 finish 🪵 🪵 :")
+    // console.log("🪵 🪵 finish 🪵 🪵 :")
 }
 
 
@@ -370,12 +372,12 @@ function checkAddParticipantButton(e) {
 
     const addParticipantButton = document.getElementById('addParticipantButton');
     if (addParticipantButton.disabled) {
-        console.log("--> addParticipantButton.disabled");
+        // console.log("--> addParticipantButton.disabled");
         e.preventDefault();
         showNotification('Please create the tournament first before adding participants.');
         return;
     }
-    console.log("-> handleAddParticipant");
+    // console.log("-> handleAddParticipant");
     handleAddParticipant(e);
     // addParticipantToTournament(tournamentId, userId);
 }
@@ -396,18 +398,18 @@ async function addParticipantToTournament(tournamentId, userId) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Error adding participant:', errorText);
+            // console.error('Error adding participant:', errorText);
             showNotification('Error adding participant: ' + errorText);
             return false;
         }
 
         const data = await response.json();
-        console.log('Participant added successfully:', data);
+        // console.log('Participant added successfully:', data);
         //showNotification('Participant added successfully 🇲🇽', 'success');
         return true;
 
     } catch (error) {
-        console.error('Network error:', error);
+        // console.error('Network error:', error);
         showNotification('Network error: ' + error.message);
         return false;
     }
@@ -444,7 +446,7 @@ async function addParticipantToTournament(tournamentId, userId) {
 
 export async function updateParticipantsList(participantNameOrObject, status, isCreator = false) {
 
-    console.log("🚨 🚨participantNameOrObject:", participantNameOrObject);
+    // console.log("🚨 🚨participantNameOrObject:", participantNameOrObject);
     const participantName = typeof participantNameOrObject === 'object' ? participantNameOrObject.username || participantNameOrObject.name : participantNameOrObject;
     const currentUser = localStorage.getItem('username');
 
@@ -477,7 +479,7 @@ export async function updateParticipantsList(participantNameOrObject, status, is
         const invitedParticipants = participantsList.children.length - 1; // Exclude the creator
         const goToWaitingAreaButton = document.getElementById('goToWaitingAreaButton');
         if (goToWaitingAreaButton) {
-            console.log("Navigating to tournament waiting area.");
+            // console.log("Navigating to tournament waiting area.");
             const isEnabled = invitedParticipants >= 3;
             goToWaitingAreaButton.disabled = !isEnabled;
 
@@ -491,21 +493,21 @@ export async function updateParticipantsList(participantNameOrObject, status, is
             if (isEnabled && newButton) {
                 newButton.addEventListener('click', () => {
                     const tournamentId = localStorage.getItem('currentTournamentId');
-                    console.log("Navigating to tournament waiting area with ID:", tournamentId);
+                    // console.log("Navigating to tournament waiting area with ID:", tournamentId);
                     // saveTournamentData();
                     window.location.href = `/#waitroom/${tournamentId}`;
                 });
-                console.log("Event listener added to go to waiting area button");
+                // console.log("Event listener added to go to waiting area button");
             }
         } else {
-            console.error("Go to waiting area button not found");
+            // console.error("Go to waiting area button not found");
         }
     }
 }
 
 
 async function checkUserOnlineStatus(username) {
-    console.log(`Checking online status for user: ${username}`);
+    // console.log(`Checking online status for user: ${username}`);
     try {
         const response = await fetch(`${BACKEND_URL}/api/users/`, {
             headers: {
@@ -515,7 +517,7 @@ async function checkUserOnlineStatus(username) {
         });
 
         if (!response.ok) {
-            console.error(`Error fetching users: ${response.status} ${response.statusText}`);
+            // console.error(`Error fetching users: ${response.status} ${response.statusText}`);
             showNotification("An error occurred while fetching users.");
             return null;
         }
@@ -533,18 +535,18 @@ async function checkUserOnlineStatus(username) {
         const activeUsers = JSON.parse(localStorage.getItem('id_active_users')) || [];
         const isActive = activeUsers.includes(String(user.id));
 
-        console.log(`User ${username} is ${isActive ? 'online' : 'offline'}`);
+        // console.log(`User ${username} is ${isActive ? 'online' : 'offline'}`);
         return isActive;
 
     } catch (error) {
-        console.error('Error checking user online status:', error);
+        // console.error('Error checking user online status:', error);
         showNotification("An error occurred while checking the user's online status.");
         return null;
     }
 }
 
 async function userExists(username) {
-    console.log(`Checking if user exists: ${username}`);
+    // console.log(`Checking if user exists: ${username}`);
     try {
         const response = await fetch(`${BACKEND_URL}/api/users/${username}/exists/`, {
             headers: {
@@ -552,28 +554,28 @@ async function userExists(username) {
                 'Content-Type': 'application/json'
             }
         });
-        console.log(`Response status: ${response.status}`);
+        // console.log(`Response status: ${response.status}`);
 
         if (response.status === 404) {
-            console.log(`User ${username} not found.`);
+            // console.log(`User ${username} not found.`);
             return false;
         }
 
         if (!response.ok) {
-            console.error(`Error checking user existence: ${response.status} ${response.statusText}`);
+            // console.error(`Error checking user existence: ${response.status} ${response.statusText}`);
             return false;
         }
 
         const data = await response.json();
-        if (data.exists) {
-            console.log(`User ${username} exists.`);
-        } else {
-            console.log(`User ${username} does not exist.`);
-        }
+        // if (data.exists) {
+        //     // console.log(`User ${username} exists.`);
+        // } else {
+        //     // console.log(`User ${username} does not exist.`);
+        // }
         return data.exists;
 
     } catch (error) {
-        console.error('Error checking if user exists:', error);
+        // console.error('Error checking if user exists:', error);
         return false;
     }
 }
@@ -632,7 +634,7 @@ async function handleCreateTournament(e) {
         return;
     }
 
-    console.log("🍀 Create Tournament form submitted");
+    // console.log("🍀 Create Tournament form submitted");
     const tournamentName = document.getElementById('tournamentNameInput').value.trim();
     if (!tournamentName) {
         showNotification('Tournament name cannot be empty.');
@@ -640,7 +642,7 @@ async function handleCreateTournament(e) {
     }
     try {
         const response = await createTournament(tournamentName);
-        console.log('Response status:', response.status);
+        // console.log('Response status:', response.status);
         if (response.ok) {
             const data = await response.json();
             showNotification("Tournament created successfully", "success");
@@ -658,11 +660,11 @@ async function handleCreateTournament(e) {
             addParticipantButton.disabled = false;
         } else {
             const errorMessage = await response.text();
-            console.error('Error from server:', errorMessage);
+            // console.error('Error from server:', errorMessage);
             throw new Error('Failed to create tournament. Server responded with an error.');
         }
     } catch (error) {
-        console.error('Caught error:', error);
+        // console.error('Caught error:', error);
         showNotification(error.message);
     }
 }
@@ -680,13 +682,13 @@ async function createTournament(tournamentName) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Response text:', errorText);
+            // console.error('Response text:', errorText);
             throw new Error('Network response was not ok');
         }
         return response;
 
     } catch (error) {
-        console.error('Network error:', error);
+        // console.error('Network error:', error);
         throw error;
     }
 }
@@ -694,7 +696,7 @@ async function createTournament(tournamentName) {
 
 export function acceptTournamentInvitation(tournamentId, username) {
     if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState !== WebSocket.OPEN) {
-      console.error('WebSocket is not connected or already closed for tournament:', tournamentId);
+    //   console.error('WebSocket is not connected or already closed for tournament:', tournamentId);
       connectTournamentWebSocket(tournamentId);
       activeWebSockets[tournamentId].onopen = () => {
         sendAcceptMessage(tournamentId, username);
@@ -723,7 +725,7 @@ export function acceptTournamentInvitation(tournamentId, username) {
     if (tournamentNameInput && participantsList) {
         // saveTournamentData();
     } else {
-        console.log("Skipping saveTournamentData as elements are not available.");
+        // console.log("Skipping saveTournamentData as elements are not available.");
     }
 
     window.location.href = `/#waitroom/${tournamentId}`;
@@ -731,7 +733,7 @@ export function acceptTournamentInvitation(tournamentId, username) {
   
   export function rejectTournamentInvitation(tournamentId, username) {
     if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState !== WebSocket.OPEN) {
-      console.error('WebSocket is not connected or already closed for tournament:', tournamentId);
+    //   console.error('WebSocket is not connected or already closed for tournament:', tournamentId);
       connectTournamentWebSocket(tournamentId);
       activeWebSockets[tournamentId].onopen = () => {
         sendRejectMessage(tournamentId, username);
@@ -752,7 +754,7 @@ export function acceptTournamentInvitation(tournamentId, username) {
       tournament_id: tournamentId
     };
   
-    console.log("Tournament invitation rejected.");
+    // console.log("Tournament invitation rejected.");
   
     activeWebSockets[tournamentId].send(JSON.stringify(message));
   
@@ -767,13 +769,13 @@ function checkGoToWaitingAreaButton(tournament) {
     const goToWaitingAreaButton = document.getElementById('goToWaitingAreaButton');
     const acceptedParticipants = tournament.participants.filter(p => p.accepted_invite).length;
 
-    console.log("🤯🤯🤯 acceptedParticipants:", acceptedParticipants);
-    console.log("🤯🤯🤯 tournament:", tournament);
+    // console.log("🤯🤯🤯 acceptedParticipants:", acceptedParticipants);
+    // console.log("🤯🤯🤯 tournament:", tournament);
 
     if (acceptedParticipants >= 4) {
         goToWaitingAreaButton.disabled = false;
         goToWaitingAreaButton.addEventListener('click', () => {
-            console.log("Diego -------------------------  nos movemos:", tournament.id);
+            // console.log("Diego -------------------------  nos movemos:", tournament.id);
             window.location.href = `/#waitroom/${tournament.id}`;
         });
     } else {
@@ -794,7 +796,7 @@ async function checkCancelCreateButton(tournament) {
 
             let tournament_id = localStorage.getItem("currentTournamentId");
 
-            console.log(">> tournament_id:", tournament_id);
+            // console.log(">> tournament_id:", tournament_id);
             
             // Diego, I am removing this since we want the user to be redirected to the homepage in case they cancel tournament creation
             //if (!tournament_id){
@@ -803,7 +805,7 @@ async function checkCancelCreateButton(tournament) {
 
             tournament = await getTournamentForId(tournament_id)
 
-            console.log('Aborting tournament creation.:', tournament);
+            // console.log('Aborting tournament creation.:', tournament);
 
 
             if (tournament && tournament.id) {
@@ -818,7 +820,7 @@ async function checkCancelCreateButton(tournament) {
                     });
 
                     if (response.ok) {
-                        console.log(`Tournament ${tournament.id} canceled successfully`);
+                        // console.log(`Tournament ${tournament.id} canceled successfully`);
 
                         // Send tournament_canceled event to WebSocket
                         const message = {
@@ -840,10 +842,10 @@ async function checkCancelCreateButton(tournament) {
                         localStorage.removeItem(`tournamentName_${tournament.id}`);
                         localStorage.removeItem(`creatorUsername_${tournament.id}`);
                     } else {
-                        console.error(`Failed to cancel tournament ${tournament.id}`);
+                        // console.error(`Failed to cancel tournament ${tournament.id}`);
                     }
                 } catch (error) {
-                    console.error(`Error canceling tournament ${tournament.id}:`, error);
+                    // console.error(`Error canceling tournament ${tournament.id}:`, error);
                 }
             } else {
                 // Remove the local storage items
@@ -854,7 +856,7 @@ async function checkCancelCreateButton(tournament) {
             window.location.href = `/#`;
         });
     } else {
-        console.error("Cancel create button not found");
+        // console.error("Cancel create button not found");
     }
 }
 

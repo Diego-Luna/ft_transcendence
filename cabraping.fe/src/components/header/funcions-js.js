@@ -20,6 +20,6 @@ export function Header_js() {
       }
     });
   } else {
-    console.log("One or more navbar elements are not found!");
+    //console.log("One or more navbar elements are not found!");
   }
 }

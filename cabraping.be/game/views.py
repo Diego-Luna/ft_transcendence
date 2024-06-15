@@ -31,6 +31,18 @@ class GameViewSet(viewsets.ModelViewSet):
             }
         )
 
+
+    # Delete a specific game
+    def destroy(self, request, *args, **kwargs):
+        game_id = kwargs.get('pk')
+        try:
+            game = Game.objects.get(pk=game_id)
+            if game:
+                self.perform_destroy(game)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Game.DoesNotExist:
+            return Response(status=status.HTTP_200_OK)
+
     # Delete all games
     @action(detail=False, methods=["delete"])
     def delete_all(self, request):

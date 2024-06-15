@@ -90,7 +90,7 @@ const router = async () => {
     }
   }
 
-  console.log("--> Route: localStorage.getItem(currentTournamentId):", localStorage.getItem("currentTournamentId"));
+  // console.log("--> Route: localStorage.getItem(currentTournamentId):", localStorage.getItem("currentTournamentId"));
   if(localStorage.getItem("currentTournamentId"))
   {
     let tournament_id =localStorage.getItem("currentTournamentId")
@@ -101,7 +101,7 @@ const router = async () => {
     }
   }
 
-  console.log("🐹 localStorage.getItem(system_game_id):", localStorage.getItem("system_game_id"));
+  // console.log("🐹 localStorage.getItem(system_game_id):", localStorage.getItem("system_game_id"));
   if (localStorage.getItem("system_game_id") || (localStorage.getItem("currentTournamentId") && localStorage.getItem("system_game_id")) )
     {
       if (localStorage.getItem("currentTournamentId"))

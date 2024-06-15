@@ -79,13 +79,19 @@ class UserUpdate(APIView):
     def patch(self, request, pk):
         try:
             user = CustomUser.objects.get(pk=pk)
+            new_username = request.data.get('username')
+
+            # Check if the new username already exists
+            if new_username and CustomUser.objects.filter(username=new_username).exclude(pk=pk).exists():
+                return Response({"error": "name not valid"}, status=status.HTTP_200_OK)
+
             serializer = UserSerializer(user, data=request.data, partial=True)  # Allow partial updates
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -102,7 +108,19 @@ class UserViewSet(viewsets.ModelViewSet):
         # DELETE /api/users/<pk>
         else:
             return UserSerializer
-    
+
+    # method to check for existing username
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            return Response({"error": "user already created"}, status=status.HTTP_200_OK)
+        if CustomUser.objects.filter(username=username).exists():
+            last_user = CustomUser.objects.last()
+            new_username = f"{username}{last_user.id + 1}"
+            request.data['username'] = new_username
+        return super().create(request, *args, **kwargs)
+
      # Delete all users
     # DELETE /api/users/
     @action(detail=False, methods=["delete"])

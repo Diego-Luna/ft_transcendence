@@ -10,7 +10,7 @@ export async function update_cancel_of_tournament(tournamentId) {
     // getTournamentForId
     let my_tournamet = await getTournamentForId(tournamentId)
 
-    console.log("/////////// update_cancel_of_tournament: my_tournamet:", my_tournamet);
+    // console.log("/////////// update_cancel_of_tournament: my_tournamet:", my_tournamet);
 
     if (my_tournamet.status === "completed"){
         return;
@@ -60,14 +60,14 @@ export async function checkUsers_is_part_of_valid_tournament(Check_id) {
         return null
     }
 
-    console.log("🚨 🚨? 🚨> Check_id:", Check_id);
-    console.log("🚨 🚨? 🚨> tournaments:",tournaments);
+    // console.log("🚨 🚨? 🚨> Check_id:", Check_id);
+    // console.log("🚨 🚨? 🚨> tournaments:",tournaments);
 
     const pendingTournament = tournaments.find(t => t.status === 'pending' && t.participants.some(p => p.user.id === Check_id));
     const progressTournament = tournaments.find(t => t.status === 'in_progress' && t.participants.some(p => p.user.id === Check_id));
 
-    console.log("🚨 🚨? 🚨> pendingTournament:",pendingTournament);
-    console.log("🚨 🚨? 🚨> progressTournament:",progressTournament);
+    // console.log("🚨 🚨? 🚨> pendingTournament:",pendingTournament);
+    // console.log("🚨 🚨? 🚨> progressTournament:",progressTournament);
 
     if (pendingTournament) {
         return false;

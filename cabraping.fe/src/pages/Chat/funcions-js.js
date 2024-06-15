@@ -25,7 +25,7 @@ let myUser = null;
 
 export async function Chat_Update_js() {
 
-  console.log("= reload ? Chat_Update_js:");
+  //console.log("= reload ? Chat_Update_js:");
   const jwt = localStorage.getItem('jwt');
   if (!jwt) {
       return;
@@ -39,7 +39,7 @@ export async function Chat_Update_js() {
   });
   myUser = await responseMyUser.json();
 
-  console.log("= reload ? myUser:", myUser);
+  //console.log("= reload ? myUser:", myUser);
   if (myUser.code === "user_not_found" || myUser.code === "token_not_valid") {
     window.location.replace("/#logout");
   }
@@ -47,9 +47,9 @@ export async function Chat_Update_js() {
 
   channels = await getUserChannels(myUser.id);
 
-  console.log("update channels:", channels);
+  //console.log("update channels:", channels);
 
-  console.log(">>>>> channel_now:", channel_now);
+  //console.log(">>>>> channel_now:", channel_now);
   if (channel_now !== "/"){
     switchChannel(channel_now);
   }
@@ -79,7 +79,7 @@ export async function Chat_js() {
     user_id = decodedPayload.user_id; // Update user_id variable with the user ID extracted from the JWT
 
     let route = getHash();
-    console.log(`-> 🦾 this.route :${route}`);
+    //console.log(`-> 🦾 this.route :${route}`);
 
     channel_now = route;
 
@@ -167,15 +167,15 @@ export async function Chat_js() {
   // Función para mostrar amigos conectados
 export function showActiveFriends(friends, check_id) {
 
-  console.log(">> showActiveFriends > friends:", friends);
+  //console.log(">> showActiveFriends > friends:", friends);
   if (!friends.some(friend => String(friend.id) === String(check_id))){
     return null
   }
 
   const activeUserIds = JSON.parse(localStorage.getItem('id_active_users')) || [];
-  console.log(">> showActiveFriends > activeUserIds:", activeUserIds);
+  //console.log(">> showActiveFriends > activeUserIds:", activeUserIds);
   const activeFriends = friends.filter(friend => activeUserIds.includes(String(friend.id)));
-  console.log(">> showActiveFriends > activeFriends:", activeFriends);
+  //console.log(">> showActiveFriends > activeFriends:", activeFriends);
 
   // if (activeFriends[0] && String(activeFriends[0].id) === String(check_id)) {
   if (activeFriends.length > 0 && activeFriends.some(friend => String(friend.id) === String(check_id))) {
@@ -247,8 +247,8 @@ async function inviteGame(jwt) {
     });
     const games = await responseGames.json();
 
-    console.log("--> 🎮🎮  my_id:", my_id, ", communication_user_id:", communication_user_id);
-    console.log("--> 🎮 games:", games);
+    //console.log("--> 🎮🎮  my_id:", my_id, ", communication_user_id:", communication_user_id);
+    //console.log("--> 🎮 games:", games);
 
     const game = games.find(
       (game) =>
@@ -257,9 +257,9 @@ async function inviteGame(jwt) {
         game.inviter.id === my_id)
     );
 
-    console.log("--> 🎮 game:", game);
+    //console.log("--> 🎮 game:", game);
     if(game){
-      console.log("game_ACCEPTED 🥶🥶🥶");
+      //console.log("game_ACCEPTED 🥶🥶🥶");
       gameId = game.id;
 
       const inviteGameButtonButton = document.getElementById('inviteGameButton');
@@ -274,7 +274,7 @@ async function inviteGame(jwt) {
       );
 
     if (game_ACCEPTED){
-      console.log("game_ACCEPTED 🥶🥶");
+      //console.log("game_ACCEPTED 🥶🥶");
       window.location.href = `/#game/${game_ACCEPTED.id}`;
     }
 
@@ -287,7 +287,7 @@ async function inviteGame(jwt) {
 
     if (game_pending)
     {
-      console.log("game_pending 🥶");
+      //console.log("game_pending 🥶");
       const acceptGameButton = document.getElementById('acceptGameButton');
       if (acceptGameButton) acceptGameButton.disabled = false;
     }
@@ -316,7 +316,7 @@ async function inviteGame(jwt) {
     );
 
     sendAcceptedGameNotifications(user_id, UserName, communication_user_id, gameId);
-    console.log({ result: await result.json() });
+    // console.log({ result: await result.json() });
     // /game
     window.location.href = `/#game/${gameId}`;
 
@@ -364,7 +364,7 @@ async function inviteGame(jwt) {
       // sockets[check_channel_infucion].close();
       delete sockets[check_channel_infucion];
 
-      console.log(">>> delete sockets[check_channel_infucion]:", sockets[check_channel_infucion]);
+      // console.log(">>> delete sockets[check_channel_infucion]:", sockets[check_channel_infucion]);
   }
 
   async function  blocks_users_frontend(jwt) {
@@ -523,13 +523,13 @@ function handleButtonClick() {
   const modal = document.getElementById("channelModal");
   const membersList = document.getElementById("channelMembers");
 
-  console.log("+++++ handleButtonClick:", modal);
+  //console.log("+++++ handleButtonClick:", modal);
   if (modal) {
 
-    console.log("-----> modal.style.display:", modal.style.display);
+    //console.log("-----> modal.style.display:", modal.style.display);
     modal.classList.remove("d-none");
     modal.classList.add("d-block");
-    console.log("-----> modal.style.display:", modal.style.display);
+    //console.log("-----> modal.style.display:", modal.style.display);
 
     fetch(`${BACKEND_URL}/api/users/`)
       .then((response) => response.json())
@@ -546,7 +546,7 @@ function handleButtonClick() {
         });
       })
       .catch((error) => {
-        console.log("Error fetching users:", error);
+        // console.log("Error fetching users:", error);
       });
   }
 
@@ -554,7 +554,7 @@ function handleButtonClick() {
   if (closeModalButton) {
     closeModalButton.addEventListener("click", () => {
       // modal.style.display = "none"; // Hide the modal
-      console.log("closeModalButton on");
+      // console.log("closeModalButton on");
       modal.classList.remove("d-block");
       modal.classList.add("d-none");
     });
@@ -654,7 +654,7 @@ function switchChannel(newChannelId) {
   // Update the current channel
   channel_now = newChannelId;
 
-  console.log(" <<<<<<< channel_now:", channel_now);
+  // console.log(" <<<<<<< channel_now:", channel_now);
 
   // Clear the chat messages from the UI
 
@@ -723,7 +723,7 @@ function switchChannel(newChannelId) {
 
     // Load messages from local storage
     loadMessagesFromLocalStorage(newChannelId);
-    console.log("--> checkRequestGame();");
+    // console.log("--> checkRequestGame();");
     checkRequestGame();
   }
 }
@@ -783,10 +783,10 @@ async function getUserChannels(userId) {
   const response = await fetch(
     `${BACKEND_URL}/api/user-channels/${userId}/?format=json`
   );
-  console.log("response:", await response);
+  // console.log("response:", await response);
   const data = await response.json();
 
-  console.log("getUserChannels:", data);
+  // console.log("getUserChannels:", data);
   return data;
 }
 
@@ -906,7 +906,7 @@ function handleSaveChannelClick() {
       const modal = document.getElementById("channelModal");
       if (modal) {
         // modal.style.display = "none";
-        console.log("------>>> style.display");
+        // console.log("------>>> style.display");
         modal.classList.remove("d-block");
         modal.classList.add("d-none");
       }

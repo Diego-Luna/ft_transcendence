@@ -17,12 +17,12 @@ function allParticipantsAccepted(participants) {
 function updateStartButton(participants) {
     const tournamentId = getHash() || null;
     if (!tournamentId) {
-        console.error("Tournament ID is null or invalid");
+        // console.error("Tournament ID is null or invalid");
         return;
     }
     const startButton = document.getElementById('startTournamentButton');
     if (!startButton) {
-        console.error("startTournamentButton element not found");
+        // console.error("startTournamentButton element not found");
         return;
     }
 
@@ -33,15 +33,15 @@ function updateStartButton(participants) {
                 // const userId = localStorage.getItem('userId'); // Ensure userId is defined
                 const userId = getUserIdFromJWT(); // Ensure userId is defined
                 if (!userId) {
-                    console.error("userId is not defined");
+                    // console.error("userId is not defined");
                     return;
                 }
 
                 let check_tournament = await getTournamentForId(tournamentId);
 
-                console.log("run -if check_tournament.participants[0].id:", (check_tournament.participants[0].id));
-                console.log("run -if userId:", (userId));
-                console.log("run -if check_tournament.participants[0].id !== userId:", (check_tournament.participants[0].id !== userId));
+                // console.log("run -if check_tournament.participants[0].id:", (check_tournament.participants[0].id));
+                // console.log("run -if userId:", (userId));
+                // console.log("run -if check_tournament.participants[0].id !== userId:", (check_tournament.participants[0].id !== userId));
                 if (check_tournament.participants[0].user.id !== userId)
                 {
                     showNotification("Sorry, amigo. Only the creator can start the tournament.", "error");
@@ -68,10 +68,10 @@ function updateStartButton(participants) {
                         }
                         handle_Tournament_game_invite(tournamentId);
                     } else {
-                        console.error('Failed to notify the server about readiness');
+                        // console.error('Failed to notify the server about readiness');
                     }
                 } catch (error) {
-                    console.error('Error notifying the server about readiness:', error);
+                    // console.error('Error notifying the server about readiness:', error);
                 }
             });
             startButton.dataset.listenerAttached = true;
@@ -98,11 +98,11 @@ export async function fetchParticipantsRSVPs(tournamentId) {
                 accepted_invite: participant.accepted_invite
             }));
         } else {
-            console.error('Failed to fetch participants status');
+            // console.error('Failed to fetch participants status');
             return [];
         }
     } catch (error) {
-        console.error('Error fetching participants:', error);
+        // console.error('Error fetching participants:', error);
         return [];
     }
 }
@@ -134,13 +134,13 @@ function updateCancelButton(isCreator) {
                 const tournamentId = localStorage.getItem('currentTournamentId');
                 let user_id = getUserIdFromJWT();
 
-                console.log("-> tournamentId:", tournamentId);
+                // console.log("-> tournamentId:", tournamentId);
                 let tournament = await getTournamentForId(tournamentId)
 
-                console.log("-> tournament:", tournament);
+                // console.log("-> tournament:", tournament);
 
                 if (tournament.participants[0].user.id === user_id) {
-                    console.log("Creator canceled the tournament.");
+                    // console.log("Creator canceled the tournament.");
                     const message = {
                         type: 'tournament_canceled',
                         event: 'tournament_canceled',
@@ -150,7 +150,7 @@ function updateCancelButton(isCreator) {
                     if (activeWebSockets[tournamentId]) {
                         activeWebSockets[tournamentId].send(JSON.stringify(message));
                     } else {
-                        console.error("WebSocket connection not found for tournament", tournamentId);
+                        // console.error("WebSocket connection not found for tournament", tournamentId);
                     }
 
                     await update_cancel_of_tournament(tournamentId);
@@ -175,7 +175,7 @@ export async function CancelTournament_for_disconnection_() {
     if (activeWebSockets[tournamentId]) {
         activeWebSockets[tournamentId].send(JSON.stringify(message));
     } else {
-        console.error("WebSocket connection not found for tournament", tournamentId);
+        // console.error("WebSocket connection not found for tournament", tournamentId);
     }
 }
 
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const userId = getUserIdFromJWT();
         if (!userId) {
-            console.error("userId is not defined");
+            // console.error("userId is not defined");
             return;
         }
 
@@ -202,22 +202,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         startButton.addEventListener('click', async function() {
             const tournamentId = getHash() || null;
             if (!tournamentId) {
-                console.error("Tournament ID is null or invalid");
+                // console.error("Tournament ID is null or invalid");
                 return;
             }
 
             // const userId = localStorage.getItem('userId');
             const userId = getUserIdFromJWT();
             if (!userId) {
-                console.error("userId is not defined");
+                // console.error("userId is not defined");
                 return;
             }
 
             let check_tournament = await getTournamentForId(tournamentId);
 
-            console.log("run -if check_tournament.participants[0].id:", (check_tournament.participants[0].id));
-            console.log("run -if userId:", (userId));
-            console.log("run -if check_tournament.participants[0].id !== userId:", (check_tournament.participants[0].id !== userId));
+            // console.log("run -if check_tournament.participants[0].id:", (check_tournament.participants[0].id));
+            // console.log("run -if userId:", (userId));
+            // console.log("run -if check_tournament.participants[0].id !== userId:", (check_tournament.participants[0].id !== userId));
             if (check_tournament.participants[0].user.id !== userId)
             {
                 showNotification("only the created one can start it", "error");
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (activeWebSockets[tournamentId]) {
                 activeWebSockets[tournamentId].send(JSON.stringify(message));
             } else {
-                console.error("WebSocket connection not found for tournament", tournamentId);
+                // console.error("WebSocket connection not found for tournament", tournamentId);
             }
         });
     }
@@ -274,30 +274,30 @@ function check_if_i_am_part_of__tournament(tournament) {
 
     if (!(tournament.status === 'pending' || tournament.status === 'in_progress'))
     {
-        console.log("Tournament ID is null or invalid");
+        // console.log("Tournament ID is null or invalid");
         //showNotificationPopup("Tournament ID is null or invalid", 'error');
         return false;
     }
 
     let userId = getUserIdFromJWT();
 
-    console.log("userId:", userId);
-    console.log("pendingTournament:", tournament.participants[0]);
+    // console.log("userId:", userId);
+    // console.log("pendingTournament:", tournament.participants[0]);
 
     const pendingTournament = tournament.participants.some(p => p.user.id === userId);
 
-    console.log("pendingTournament:", pendingTournament);
+    // console.log("pendingTournament:", pendingTournament);
     if (pendingTournament) {
         if(pendingTournament.id)
         {
             localStorage.setItem('currentTournamentId', pendingTournament.id);
             localStorage.setItem(`system_Tournament_status_${pendingTournament.id}`, "in");
         }
-        console.log("siiiiiiiii");
+        // console.log("siiiiiiiii");
         return true;
     }
 
-    console.log("noooooooooo");
+    // console.log("noooooooooo");
     return false;
 }
 
@@ -313,26 +313,26 @@ async function initializeTournamentWaitingArea() {
 
     const tournamentId = getHash() || null;
     if (!tournamentId) {
-        console.log("Tournament ID is null or invalid");
+        // // console.log("Tournament ID is null or invalid");
         return;
     }
 
     let tournament_data = await getTournamentForId(tournamentId);
 
-    console.log("🚨🚨🚨🚨 tournament_data:", tournament_data);
+    // console.log("🚨🚨🚨🚨 tournament_data:", tournament_data);
 
     if (!tournament_data) {
-        console.log("Tournament ID is null or invalid");
+        // console.log("Tournament ID is null or invalid");
         //showNotificationPopup("Tournament ID is null or invalid. Reloading page.");
         window.location.href = '/#';
         return;
     }
 
     let zstatus = check_if_i_am_part_of__tournament(tournament_data);
-    console.log("--? : check_if_i_am_part_of__tournament:", zstatus);
+    // console.log("--? : check_if_i_am_part_of__tournament:", zstatus);
     if (zstatus === false){
 
-        console.log("por que");
+        // console.log("por que");
         window.location.href = '/#';
         return;
     }
@@ -370,7 +370,7 @@ export async function update_list_tournamet() {
     const creatorUsername = localStorage.getItem('creatorUsername_' + tournamentId_update_list_tournamet);
     const isCreator = localStorage.getItem('username') === creatorUsername;
 
-    console.log(">> setInterval tournamentId:", tournamentId_update_list_tournamet);
+    // console.log(">> setInterval tournamentId:", tournamentId_update_list_tournamet);
     const participants = await fetchParticipantsRSVPs(tournamentId_update_list_tournamet);
     updateWaitingParticipantsList(participants);
     updateCancelButton(isCreator);
@@ -378,7 +378,7 @@ export async function update_list_tournamet() {
 
 
 export function startTournament() {
-    console.log('All participants are ready. Starting the tournament...');
+    // console.log('All participants are ready. Starting the tournament...');
     // window.location.href = `/tournament/${tournamentId}/remote-users`;
 }
 
@@ -388,7 +388,7 @@ export async function handleTournamentCanceled(data) {
 
     let my_tournamet = await getTournamentForId(tournament_id)
 
-    console.log("/////////// my_tournamet:", my_tournamet);
+    // console.log("/////////// my_tournamet:", my_tournamet);
 
     if (my_tournamet.status === "completed"){
         return;

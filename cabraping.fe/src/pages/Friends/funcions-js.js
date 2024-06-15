@@ -22,6 +22,7 @@ export async function Friends_js() {
 
   if (!jwt) {
     window.location.replace("/#");
+    return;
   }
 
   await fetchMyUserData();
@@ -105,9 +106,9 @@ export async function FriendsRender() {
 
       const hideInviteButton = Boolean(unfinishedGame);
 
-      console.log("> myUserData.friends:", myUserData.friends, friend.id);
-      console.log("> friend.id:", friend.id);
-      console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
+      // console.log("> myUserData.friends:", myUserData.friends, friend.id);
+      // console.log("> friend.id:", friend.id);
+      // console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
       let friendActive = showActiveFriends(myUserData.friends, friend.id);
       let HTML_friendActive = "";
 
@@ -208,7 +209,7 @@ export async function FriendRequestsRender() {
   });
 
   if (friendRequests.length <= 0) {
-    friendRequestsListElement.innerHTML = "<p>No Friend Requests Yet</p>";
+    friendRequestsListElement.innerHTML = "<p>No new friend requests yet</p>";
     return null;
   }
 

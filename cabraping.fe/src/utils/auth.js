@@ -8,10 +8,10 @@ export function refreshToken() {
     .then(response => response.json())
     .then(data => {
         localStorage.setItem('jwt', data.access);
-        console.log('Token refreshed');
+        // console.log('Token refreshed');
     })
     .catch(error => {
-        console.error('Error refreshing token:', error);
+        // console.error('Error refreshing token:', error);
         window.location.href = '/login';
     });
 }
