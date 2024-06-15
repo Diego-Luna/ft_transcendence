@@ -309,7 +309,6 @@ export function Tournament_check_notificacion() {
 
 
         if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState === WebSocket.CLOSED) {
-            console.log("run");
             connectTournamentWebSocket(tournamentId);
         }
 
@@ -361,7 +360,6 @@ export function handleTournamentInvite(data, tournamentId) {
     localStorage.setItem(`system_tournament_name_${tournamentId}`, message)
     localStorage.setItem(`system_tournament_name_${tournamentId}_data`, data)
     // Ensure WebSocket connection for the tournament
-    console.log("run-0");
     // if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState === WebSocket.CLOSED) {
     //     console.log("run-1");
     //     connectTournamentWebSocket(tournamentId);
@@ -414,7 +412,7 @@ export async function handleTournamentWebSocketMessage(data, tournamentId) {
             hideModal('tournamentInviteModal');
             if (localStorage.getItem("system_game_id"))
             {
-                if (gameSocket)
+                if (gameSocket.readyState === 1)
                 {
                   gameSocket.close()
                 }
@@ -573,7 +571,6 @@ export async function connectWebSocketGlobal() {
                 Friends_js();
                 Users_js();
 
-                console.log("localStorage.getItem(`currentTournamentId`):", localStorage.getItem(`currentTournamentId`));
                 if (localStorage.getItem(`currentTournamentId`))
                 {
                     let tournamentId = localStorage.getItem(`currentTournamentId`);

@@ -69,8 +69,6 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
 
     let myUserName = localStorage.getItem("username");
 
-    console.log("Send -> tournament_id:",tournament_id," first_player:", first_player, ", secong_player:", secong_player, ", winner:", winner);
-
     const response = await fetch(
         `${BACKEND_URL}/api/matches/`,
         {

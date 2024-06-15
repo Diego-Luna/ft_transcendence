@@ -113,17 +113,17 @@ export async function Chat_js() {
       inviteGameButtonButton.addEventListener('click', () => inviteGame(jwt));
     }
 
+    const acceptGameButton = document.getElementById('acceptGameButton');
+    if (acceptGameButton) {
+      acceptGameButton.disabled = true;
+      acceptGameButton.addEventListener('click', () => acceptGame());
+    }
+
     // Agregar evento para el botón "Users"
     const usersRouteButton = document.getElementById('usersRouteButton');
     if (usersRouteButton) {
       usersRouteButton.disabled = true;
       usersRouteButton.addEventListener('click', () => window.location.href = `#user/${communication_user_id}`);
-    }
-
-    const acceptGameButton = document.getElementById('acceptGameButton');
-    if (acceptGameButton) {
-      acceptGameButton.disabled = true;
-      acceptGameButton.addEventListener('click', () => acceptGame());
     }
 
     const button = document.getElementById('addChannel');
@@ -200,6 +200,29 @@ async function inviteGame(jwt) {
           ((game.invitee.id === myUser.id && game.inviter.id === communication_user_id) ||
           (game.inviter.id === myUser.id && game.invitee.id === communication_user_id))
   );
+
+
+
+  const existing_invitate_Game_me = games.find(
+    (game) =>
+        game.invitationStatus === "PENDING" &&
+        (game.invitee.id === myUser.id || game.inviter.id === myUser.id)
+  );
+  const existing_invitate_Game_order = games.find(
+    (game) =>
+        game.invitationStatus === "PENDING" &&
+        (game.invitee.id === communication_user_id || game.inviter.id === communication_user_id)
+  );
+
+  console.log("games:", games);
+  console.log("existing_invitate_Game_me:", existing_invitate_Game_me);
+  console.log("existing_invitate_Game_order:", existing_invitate_Game_order);
+
+  if (existing_invitate_Game_me || existing_invitate_Game_order)
+  {
+    showNotification('the user already has an invitation to the game', 'warning');
+    return;
+  }
 
   if (existingGame) {
       showNotification('There is already a pending game invitation', 'warning');

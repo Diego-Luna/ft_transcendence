@@ -114,7 +114,7 @@ class UserViewSet(viewsets.ModelViewSet):
         username = request.data.get('username')
         email = request.data.get('email')
         if CustomUser.objects.filter(email=email).exists():
-            return Response({"error": "user already created"}, status=status.HTTP_200_OK)
+            return Response({"error": "user already created"}, status=status.HTTP_401_UNAUTHORIZED)
         if CustomUser.objects.filter(username=username).exists():
             last_user = CustomUser.objects.last()
             new_username = f"{username}{last_user.id + 1}"

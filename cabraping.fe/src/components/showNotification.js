@@ -11,9 +11,21 @@ export function showNotification(message, type) {
     "d-inline-block",
   );
   // "notification"
-  if (type === "success")
+  if (type === "success" || type === "success")
+  {
+    notification.classList.remove("bg-danger");
+    notification.classList.remove("bg-warning");
     notification.classList.add("bg-success");
+    }
+  if (type === "warning")
+  {
+    notification.classList.remove("bg-danger");
+    notification.classList.remove("bg-success");
+    notification.classList.add("bg-warning");
+  }
   else {
+    notification.classList.remove("bg-danger");
+    notification.classList.remove("bg-warning");
     notification.classList.add("bg-danger");
   }
 
