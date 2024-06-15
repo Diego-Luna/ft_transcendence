@@ -23,10 +23,9 @@ export async function Friends_html() {
       </ul>
 
       <h2>Friend Requests</h2>
-      <p>We are the invitee</p>
       <ul id="friend-requests-list" class="list-group">
         <!-- friendsData -->
-        <p>No Friend Requests Yet</p>
+        <p>No new friend requests yet</p>
       </ul>
     </div>
   `;

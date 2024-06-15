@@ -146,9 +146,7 @@ async function list_of_Tournament(id) {
     // console.log("Tournament: id:", id);
     // console.log("Tournament: tournaments:", tournaments);
 
-    if (!tournaments)
-    {
-        // alert("1 - Problem with the backend. Reload page."); // Diego
+    if (!tournaments) {
         return null;
     }
     const pendingTournament = tournaments.find(t => t.status === 'in_progress' && t.participants.some(p => p.user.id === id));
@@ -196,7 +194,6 @@ export async function system_invite_game_Tournament() {
     }
 
 }
-
 
 export async function handle_Tournament_game_invite(tournament_id) {
 

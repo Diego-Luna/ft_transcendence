@@ -2,13 +2,12 @@ import { showNotification, showNotificationPopup } from "./showNotification.js";
 import { Chat_Update_js, getUserIdFromJWT } from "../pages/Chat/funcions-js.js";;
 import { Friends_js } from "../pages/Friends/funcions-js.js";
 import { Users_js } from "../pages/Users/funcions-js.js";
-
+import { timeout } from "../../utils/timeout.js";
 import { updateParticipantsList, acceptTournamentInvitation, rejectTournamentInvitation, connectTournamentWebSocket, WS_check_the_torunament_pending, TournamentInit, Check_if_im_the_creator_to_reload } from "../pages/Tournament/funcions-js.js";
 import { getToken } from "../utils/get-token.js";
 import { showModal, hideModal } from "../utils/modal.js";
 import { startTournament, handleTournamentCanceled, update_list_tournamet } from "../pages/TournamentWaitingArea/functions-js.js";
 import { updateWaitingParticipantsList } from "../pages/TournamentWaitingArea/functions-js.js";
-
 import { sendAcceptedGameNotifications, sendTournamentNotifications, sendDeleteMatchedMessage, handleUpdateWaitingList, sendUpdateList_of_tournament_Notifications, sendGameCancelTournamentNotifications } from "./wcGlobal-funcions-send-message.js";
 import { sendGameAcceptTournament_final_Waiting, sendGameAcceptTournament_Waiting, system_invite_game_Tournament } from "../pages/TournamentWaitingArea/game-logic.js";
 import { Cancel_a_Game, checkAcceptedGames, getDifference_in_array } from "../pages/Game/cancel.js";
@@ -467,6 +466,8 @@ async function execute_processes_by_category_message(message, myUser) {
                 //console.log("-> system-tournament - final showNotificationPopup myUser:", myUser,);
                 //console.log("-> system-tournament - final showNotificationPopup message.dest_user_id:", message.dest_user_id, ", message.user_id:", message.user_id);
                 // diego - aceptarjuego
+                showNotification("Semifinals have ended. Final starting in 10 seconds...", "info");
+                await timeout(10000);
                 sendGameAcceptTournament_final_Waiting(message.dest_user_id, message.user_id, myUser);
             }else{
                 Chat_Update_js();
@@ -506,7 +507,7 @@ async function run_processes_per_message(message) {
             gameSocket.close();
             await Cancel_a_Game(localStorage.getItem("system_game_id"));
             localStorage.removeItem("system_game_id");
-            showNotificationPopup(message.user_name, "Cancel Game")
+            //showNotificationPopup(message.user_name, "Cancel Game")
             window.location.href = `/#`;
             break;
         default:

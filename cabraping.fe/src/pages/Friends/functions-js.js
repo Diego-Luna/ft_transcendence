@@ -2,9 +2,9 @@ import { BACKEND_URL } from "../../components/wcGlobal.js";
 import {
   sendFriendAcceptdNotifications,
   sendFriendDeletedNotifications,
-} from "../../components/wcGlobal-funcions-send-message.js";
+} from "../../components/wcGlobal-functions-send-message.js";
 import { getToken } from "../../utils/get-token.js";
-import { showActiveFriends } from "../Chat/funcions-js.js";
+import { showActiveFriends } from "../Chat/functions-js.js";
 
 // Extract the IP address from the URL used to access the frontend
 // const frontendURL = new URL(window.location.href);
@@ -22,7 +22,6 @@ export async function Friends_js() {
 
   if (!jwt) {
     window.location.replace("/#");
-    return;
   }
 
   await fetchMyUserData();
@@ -86,6 +85,13 @@ export async function FriendsRender() {
         );
       });
 
+      // Diego:
+     // 89:13  error  'canGoToGame' is assigned a value but never used       no-unused-vars
+      //97:13  error  'canAccceptGame' is assigned a value but never used    no-unused-vars
+     //106:13  error  'hideInviteButton' is assigned a value but never used  no-unused-vars
+     //166:13  error  'result' is assigned a value but never used            no-unused-vars
+     //267:13  error  'response' is assigned a value but never used          no-unused-vars
+
       // Check for games that the user can join or continue
       const canGoToGame = games.find((game) => {
         return (
@@ -106,9 +112,9 @@ export async function FriendsRender() {
 
       const hideInviteButton = Boolean(unfinishedGame);
 
-      // console.log("> myUserData.friends:", myUserData.friends, friend.id);
-      // console.log("> friend.id:", friend.id);
-      // console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
+      console.log("> myUserData.friends:", myUserData.friends, friend.id);
+      console.log("> friend.id:", friend.id);
+      console.log("> showActiveFriends:", showActiveFriends(myUserData.friends, friend.id));
       let friendActive = showActiveFriends(myUserData.friends, friend.id);
       let HTML_friendActive = "";
 
@@ -213,28 +219,17 @@ export async function FriendRequestsRender() {
     return null;
   }
 
-  const friendRequestsDataString = friendRequests
-    .map((friendRequest) => {
-      return `
-  <li id="${friendRequest.id}" class="list-group-item d-flex gap-4 align-items-center">
+const friendRequestsDataString = friendRequests
+  .map((friendRequest) => {
+    return `<li id="${friendRequest.id}" class="list-group-item d-flex gap-4 align-items-center">
       <h3>${friendRequest.from_user.username}</h3>
-    <div className="d-flex gap-4">
-      <button
-        type="button"
-        class="btn btn-sm btn-primary"
-        data-action="confirm"
-        data-from-id="${friendRequest.from_user.id}"
-        data-id="${friendRequest.id}">Confirm</button>
-        <button
-        type="button"
-        class="btn btn-sm btn-secondary "
-        data-action="delete"
-        data-from-id="${friendRequest.from_user.id}"
-        data-id="${friendRequest.id}">Delete</button>
-    </div>
-  </li>`;
-    })
-    .join("");
+      <div class="d-flex gap-4">
+        <button type="button" class="btn btn-sm btn-primary" data-action="confirm" data-from-id="${friendRequest.from_user.id}" data-id="${friendRequest.id}">Confirm</button>
+        <button type="button" class="btn btn-sm btn-secondary" data-action="delete" data-from-id="${friendRequest.from_user.id}" data-id="${friendRequest.id}">Delete</button>
+      </div>
+    </li>`;
+  })
+  .join("");
 
   // render all the friend requests first
   friendRequestsListElement.innerHTML = friendRequestsDataString;

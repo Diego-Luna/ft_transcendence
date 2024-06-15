@@ -19,7 +19,7 @@ import { Friends_html } from "../pages/Friends/html.js";
 import { Tournament_html } from "../pages/Tournament/html.js";
 import { TournamentInit, WS_check_the_torunament_pending } from "../pages/Tournament/funcions-js.js";
 import { TournamentWaitingArea_html } from "../pages/TournamentWaitingArea/html.js";
-import { CancelTournament_for_descconecte_, initializeTournamentWaitingArea } from "../pages/TournamentWaitingArea/functions-js.js";
+import { CancelTournament_for_disconnection_, initializeTournamentWaitingArea } from "../pages/TournamentWaitingArea/functions-js.js";
 import { Friends_js } from "../pages/Friends/funcions-js.js";
 import { Chat_js, Chat_Update_js, getUserIdFromJWT } from "../pages/Chat/funcions-js.js";
 import { Chat_html } from "../pages/Chat/html.js";
@@ -106,7 +106,7 @@ const router = async () => {
     {
       if (localStorage.getItem("currentTournamentId"))
       {
-        CancelTournament_for_descconecte_();
+        CancelTournament_for_disconnection_();
         return;
       }
       if (gameSocket)
