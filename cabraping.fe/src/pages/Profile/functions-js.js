@@ -1,12 +1,6 @@
 import { BACKEND_URL } from '../../components/wcGlobal.js';
 import { getHash } from '../../utils/getHash.js';
 
-// Extract the IP address from the URL used to access the frontend
-// const frontendURL = new URL(window.location.href);
-// const serverIPAddress = frontendURL.hostname;
-// const serverPort = 8000; // Specify the port your backend server is running on
-// const BACKEND_URL = `http://${serverIPAddress}:${serverPort}`;
-
 let users = [];
 let userId = null;
 

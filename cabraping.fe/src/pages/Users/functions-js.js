@@ -3,12 +3,6 @@ import { sendFriendRequestNotifications } from "../../components/wcGlobal-functi
 import { showActiveFriends } from "../Chat/functions-js.js";
 import { Users_html } from "./html.js";
 
-// Extract the IP address from the URL used to access the frontend
-// const frontendURL = new URL(window.location.href);
-// const serverIPAddress = frontendURL.hostname;
-// const serverPort = 8000; // Specify the port your backend server is running on
-// const BACKEND_URL = `http://${serverIPAddress}:${serverPort}`;
-
 let myUser = null;
 let users = [];
 let friendRequests = [];

@@ -7,7 +7,6 @@ import { getUserIdFromJWT } from '../Chat/funcions-js.js';
 import { handle_Tournament_game_invite } from './game-logic.js';
 import { getTournamentForId, update_cancel_of_tournament } from '../Tournament/cancel.js';
 
-
 // Check if all participants have accepted the invitation
 function allParticipantsAccepted(participants) {
     return participants.every(participant => participant.accepted_invite);
@@ -328,9 +327,9 @@ async function initializeTournamentWaitingArea() {
         return;
     }
 
-    let zstatus = check_if_i_am_part_of__tournament(tournament_data);
-    // console.log("--? : check_if_i_am_part_of__tournament:", zstatus);
-    if (zstatus === false){
+    let status = check_if_i_am_part_of__tournament(tournament_data);
+    //console.log("--? : check_if_i_am_part_of__tournament:", status);
+    if (status === false){
 
         // console.log("por que");
         window.location.href = '/#';

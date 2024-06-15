@@ -195,7 +195,6 @@ export async function system_invite_game_Tournament() {
 
 }
 
-
 export async function handle_Tournament_game_invite(tournament_id) {
 
     let status = await system_invite_game_Tournament()

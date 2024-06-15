@@ -6,7 +6,7 @@ import { getUserIdFromJWT } from "../Chat/funcions-js.js";
 import { update_cancel_of_tournament } from "../Tournament/cancel.js";
 import { fetchTournaments, loadTournamentData } from "../Tournament/funcions-js.js";
 // import { handle_Tournament_game_invite } from "../TournamentWaitingArea/game-logic.js";
-
+import { timeout } from "../../utils/timeout.js";
 
 async function update_winner_of_tournament(tournamentId, winner) {
 
@@ -64,8 +64,11 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
         window.location.href = `/#`;
         return;
     }
-
+    
     showNotification("You won. Congratulations!");
+    await timeout(5000); 
+    //showNotification("Semifinals have ended. Finals starting in 10 seconds...", "info");
+    //await timeout(10000);
 
     let myUserName = localStorage.getItem("username");
 
