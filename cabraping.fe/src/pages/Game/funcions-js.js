@@ -295,11 +295,11 @@ export async function Game_js() {
       const result = response.json;
       localStorage.removeItem("system_game_id");
 
-      // Diego - save data in the banckend
+      // Diego - save data in the backend
       setTimeout( async () =>  {
         await Send_data_bacnd_the_winner(game.inviter.id, game.invitee.id, winnerId);
       }, Math.floor(Math.random() * 300));
-      // Diego - sen the winner
+      // Diego - send the winner
 
       return; // Stop further rendering
     }

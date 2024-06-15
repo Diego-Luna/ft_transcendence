@@ -66,7 +66,6 @@ function updateStartButton(participants) {
                         if (participantsList) {
                             participantsList.innerHTML = '';
                         }
-                        // Diego to do - logic game - update everyone
                         handle_Tournament_game_invite(tournamentId);
                     } else {
                         console.error('Failed to notify the server about readiness');
@@ -165,7 +164,7 @@ function updateCancelButton(isCreator) {
 }
 
 // Diego
-export async function CancelTournament_for_descconecte_() {
+export async function CancelTournament_for_disconnection_() {
     const tournamentId = localStorage.getItem('currentTournamentId');
     const message = {
         type: 'tournament_canceled',

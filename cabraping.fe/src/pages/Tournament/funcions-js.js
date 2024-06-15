@@ -225,7 +225,6 @@ async function loadTournamentData(tournamentId) {
             if (data.participants.length >= 4){
                 if ((number_invites + 1) === i ) {
                     showNotification("You can only invite three other users.", "error")
-                    // Diego, we need to remove the extra invitee from the list
                 } else {
                     number_invites = i;
                 }

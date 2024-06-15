@@ -146,17 +146,13 @@ async function list_of_Tournament(id) {
     console.log("Tournament: id:", id);
     console.log("Tournament: tournaments:", tournaments);
 
-    if (!tournaments)
-    {
-        // alert("1 - Problem with the backend. Reload page."); // Diego
+    if (!tournaments) {
         return null;
     }
     const pendingTournament = tournaments.find(t => t.status === 'in_progress' && t.participants.some(p => p.user.id === id));
 
     console.log("in_progressTournament:", pendingTournament);
-    if (!pendingTournament)
-    {
-        // alert("2 - Problem with the backend. Reload page."); // Diego, do we really want the user to see this and the other?
+    if (!pendingTournament) {
         return null;
     }
 
