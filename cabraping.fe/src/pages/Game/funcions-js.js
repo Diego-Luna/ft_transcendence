@@ -4,7 +4,6 @@ import { getHash } from "../../utils/getHash.js";
 import { getUserIdFromJWT } from "../Chat/funcions-js.js";
 import { Send_data_bacnd_the_winner } from "./tournament-logic.js";
 
-
 export let gameSocket;
 
 export async function Game_js() {
@@ -23,31 +22,29 @@ export async function Game_js() {
   const myUserData = await responseUser.json();
 
   // Fetch initial game data/details
-  // const responseGame = await fetch(`${BACKEND_URL}/api/games/${gameId}/`, {
-  //   headers: { Authorization: `Bearer ${jwt}` },
-  // });
-  // const game = await responseGame.json();
   const responseGame = await fetch(`${BACKEND_URL}/api/games/`, {
     headers: { Authorization: `Bearer ${jwt}` },
   });
   const games_data = await responseGame.json();
 
-  if (games_data.detail || games_data.length === 0)
-  {
+  if (games_data.detail || games_data.length === 0) {
     window.location.replace("/#");
-    return
+    return;
   }
 
-  let game = games_data.find((game) => String(game.id) === gameId );
+  let game = games_data.find((game) => String(game.id) === gameId);
 
   let checMyId = getUserIdFromJWT();
-  if ( !game || !(game.inviter.id === checMyId || game.invitee.id === checMyId) || game.invitationStatus !== "ACCEPTED" ){
+  if (
+    !game ||
+    !(game.inviter.id === checMyId || game.invitee.id === checMyId) ||
+    game.invitationStatus !== "ACCEPTED"
+  ) {
     window.location.replace("/#");
-    return
+    return;
   }
 
-  if (!game.playMode)
-  {
+  if (!game.playMode) {
     window.location.replace("/#");
     return;
   }
@@ -97,6 +94,7 @@ export async function Game_js() {
   // game loop, 60 FPS because the backend sent that much
   gameSocket.onmessage = function (event) {
     const data = JSON.parse(event.data);
+    console.log(data.message);
     renderGameState(data.message);
   };
 
@@ -126,33 +124,6 @@ export async function Game_js() {
   const paddleHeight = grid * 5;
   const maxPaddleY = canvasElement.height - grid - paddleHeight;
 
-  let leftPaddle = {
-    x: grid * 2,
-    y: canvasElement.height / 2 - paddleHeight / 2,
-    width: grid,
-    height: paddleHeight,
-    dy: 0,
-  };
-  let rightPaddle = {
-    x: canvasElement.width - grid * 3,
-    y: canvasElement.height / 2 - paddleHeight / 2,
-    width: grid,
-    height: paddleHeight,
-    dy: 0,
-  };
-  let ball = {
-    x: canvasElement.width / 2,
-    y: canvasElement.height / 2,
-    width: grid,
-    height: grid,
-    resetting: false,
-  };
-
-  // Define variables to accumulate paddle movements
-  let leftPaddleMovement = 0;
-  let rightPaddleMovement = 0;
-  const MOVEMENT_SPEED = 5; // Adjust as needed
-
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("keyup", handleKeyUp);
 
@@ -164,88 +135,91 @@ export async function Game_js() {
   };
 
   function handleKeyDown(e) {
+    let direction = null;
+
     if (game.playMode === 1) {
       // W key
       if (e.which === KEYS.W) {
-        leftPaddleMovement = -MOVEMENT_SPEED;
+        direction = "left_up";
       }
       // S key
       if (e.which === KEYS.S) {
-        leftPaddleMovement = MOVEMENT_SPEED;
+        direction = "left_down";
       }
       // Up arrow key
       if (e.which === KEYS.UP) {
-        rightPaddleMovement = -MOVEMENT_SPEED;
+        direction = "right_up";
       }
       // Down arrow key
       if (e.which === KEYS.DOWN) {
-        rightPaddleMovement = MOVEMENT_SPEED;
+        direction = "right_down";
       }
     } else if (game.playMode === 2) {
       if (isLeftPlayer) {
         // W key
         if (e.which === KEYS.W) {
-          leftPaddleMovement = -MOVEMENT_SPEED;
+          direction = "left_up";
         }
         // S key
         if (e.which === KEYS.S) {
-          leftPaddleMovement = MOVEMENT_SPEED;
+          direction = "left_down";
         }
       } else if (isRightPlayer) {
         // Up arrow key
         if (e.which === KEYS.UP) {
-          rightPaddleMovement = -MOVEMENT_SPEED;
+          direction = "right_up";
         }
         // Down arrow key
         if (e.which === KEYS.DOWN) {
-          rightPaddleMovement = MOVEMENT_SPEED;
+          direction = "right_down";
         }
       }
     }
 
-    // Send movement data to server
-    if (gameSocket)
-    {
+    if (direction && gameSocket) {
       gameSocket.send(
         JSON.stringify({
-          paddle_move_left: leftPaddleMovement,
-          paddle_move_right: rightPaddleMovement,
+          action: "move",
+          direction: direction,
         })
       );
     }
   }
 
   function handleKeyUp(e) {
+    let direction = null;
+
     if (game.playMode === 1) {
       // W or S key
       if (e.which === KEYS.W || e.which === KEYS.S) {
-        leftPaddleMovement = 0;
+        direction = "left_stop";
       }
       // Up or Down arrow key
       if (e.which === KEYS.UP || e.which === KEYS.DOWN) {
-        rightPaddleMovement = 0;
+        direction = "right_stop";
       }
     } else if (game.playMode === 2) {
       if (isLeftPlayer) {
         // W or S key
         if (e.which === KEYS.W || e.which === KEYS.S) {
-          leftPaddleMovement = 0;
+          direction = "left_stop";
         }
       } else if (isRightPlayer) {
         // Up or Down arrow key
         if (e.which === KEYS.UP || e.which === KEYS.DOWN) {
-          rightPaddleMovement = 0;
+          direction = "right_stop";
         }
       }
     }
 
-    // Send stop message to server
-    gameSocket.send(
-      JSON.stringify({
-        paddle_move_left: leftPaddleMovement,
-        paddle_move_right: rightPaddleMovement,
-      })
-    );
+    if (direction && gameSocket) {
+      gameSocket.send(
+        JSON.stringify({
+          action: "move",
+          direction: direction,
+        })
+      );
+    }
   }
 
   async function renderGameState(state) {
@@ -253,7 +227,7 @@ export async function Game_js() {
     leftPaddleScoreElement.innerText = state.left_score || 0;
     rightPaddleScoreElement.innerText = state.right_score || 0;
 
-    if(!localStorage.getItem("system_game_id")){
+    if (!localStorage.getItem("system_game_id")) {
       gameSocket.close();
 
       // Optionally remove event listeners to prevent further key inputs
@@ -261,7 +235,6 @@ export async function Game_js() {
       document.removeEventListener("keyup", handleKeyUp);
       return;
     }
-
 
     if (state.winner) {
       // Close the WebSocket connection
@@ -306,14 +279,17 @@ export async function Game_js() {
         }
       );
 
-      const result = response.json;
+      const result = await response.json();
       localStorage.removeItem("system_game_id");
 
-      // Diego - save data in the banckend
-      setTimeout( async () =>  {
-        await Send_data_bacnd_the_winner(game.inviter.id, game.invitee.id, winnerId);
+      // Save data in the backend
+      setTimeout(async () => {
+        await Send_data_bacnd_the_winner(
+          game.inviter.id,
+          game.invitee.id,
+          winnerId
+        );
       }, Math.floor(Math.random() * 300));
-      // Diego - sen the winner
 
       return; // Stop further rendering
     }
@@ -325,6 +301,9 @@ export async function Game_js() {
     const canvasHeight = canvasElement.height;
     const paddleHeight = grid * 5;
 
+    const leftPaddleX = grid * 2;
+    const rightPaddleX = canvasElement.width - grid * 3;
+
     const leftPaddleY =
       (state.left_paddle_y / 100) * (canvasHeight - paddleHeight);
     const rightPaddleY =
@@ -335,16 +314,11 @@ export async function Game_js() {
 
     // Draw paddles
     context.fillStyle = "white";
-    context.fillRect(leftPaddle.x, leftPaddleY, leftPaddle.width, paddleHeight);
-    context.fillRect(
-      rightPaddle.x,
-      rightPaddleY,
-      rightPaddle.width,
-      paddleHeight
-    );
+    context.fillRect(leftPaddleX, leftPaddleY, grid, paddleHeight);
+    context.fillRect(rightPaddleX, rightPaddleY, grid, paddleHeight);
 
     // Draw ball
-    context.fillRect(ballX, ballY, ball.width, ball.height);
+    context.fillRect(ballX, ballY, grid, grid);
 
     // Draw the field borders
     context.fillStyle = "lightgrey";

@@ -25,6 +25,9 @@ class Game:
         self.winner = None
         self.players = {"left": None, "right": None}  # Track players
         self.loop_running = False  # Flag to indicate if the game loop is running
+        self.left_paddle_movement = 0
+        self.right_paddle_movement = 0
+        self.MOVEMENT_SPEED = 1.5
 
     def detect_collisions(self):
         # Check collision with left paddle
@@ -36,7 +39,6 @@ class Game:
                 self.left_paddle_x + 1
             )  # Prevent ball from going inside paddle
             self.ball_dx *= -1
-        #this is jo 
         # Check collision with right paddle
         if (
             self.ball_x >= self.right_paddle_x - 1  # Adjust collision margin
@@ -54,6 +56,12 @@ class Game:
     def update_state(self):
         self.ball_x += self.ball_dx
         self.ball_y += self.ball_dy
+
+        self.left_paddle_y += self.left_paddle_movement
+        self.right_paddle_y += self.right_paddle_movement
+
+        self.left_paddle_y = max(0, min(self.left_paddle_y, 100))
+        self.right_paddle_y = max(0, min(self.right_paddle_y, 100))
 
         # Check and handle ball collisions with the paddles
         self.detect_collisions()
@@ -78,13 +86,21 @@ class Game:
         elif self.right_score == 3:
             self.winner = "right"
 
-    def paddle_move_left(self, dy):
-        self.left_paddle_y += dy
-        self.left_paddle_y = max(0, min(self.left_paddle_y, 100))
+    def paddle_move_left(self, direction):
+        if direction == "left_up":
+            self.left_paddle_movement = -self.MOVEMENT_SPEED
+        elif direction == "left_down":
+            self.left_paddle_movement = self.MOVEMENT_SPEED
+        elif direction == "left_stop":
+            self.left_paddle_movement = 0
 
-    def paddle_move_right(self, dy):
-        self.right_paddle_y += dy
-        self.right_paddle_y = max(0, min(self.right_paddle_y, 100))
+    def paddle_move_right(self, direction):
+        if direction == "right_up":
+            self.right_paddle_movement = -self.MOVEMENT_SPEED
+        elif direction == "right_down":
+            self.right_paddle_movement = self.MOVEMENT_SPEED
+        elif direction == "right_stop":
+            self.right_paddle_movement = 0
 
     def get_state(self):
         return {
@@ -171,13 +187,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         game = self.games[self.game_id]
 
-        # Aggregate movements for left and right paddles
-        left_movement = data.get("paddle_move_left", 0)
-        right_movement = data.get("paddle_move_right", 0)
-
-        # Move left paddle and move right paddle
-        game.paddle_move_left(left_movement)
-        game.paddle_move_right(right_movement)
+        # Handle paddle movement
+        if data["action"] == "move":
+            direction = data["direction"]
+            if "left" in direction:
+                game.paddle_move_left(direction)
+            elif "right" in direction:
+                game.paddle_move_right(direction)
 
         state = game.get_state()
 
