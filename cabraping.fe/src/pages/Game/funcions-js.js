@@ -301,8 +301,8 @@ export async function Game_js() {
     const canvasHeight = canvasElement.height;
     const paddleHeight = grid * 5;
 
-    const leftPaddleX = grid * 2;
-    const rightPaddleX = canvasElement.width - grid * 3;
+    const leftPaddleX = 0; // Position at the very left edge
+    const rightPaddleX = canvasWidth - grid; // Position at the very right edge
 
     const leftPaddleY =
       (state.left_paddle_y / 100) * (canvasHeight - paddleHeight);
@@ -314,8 +314,18 @@ export async function Game_js() {
 
     // Draw paddles
     context.fillStyle = "white";
-    context.fillRect(leftPaddleX, leftPaddleY, grid, paddleHeight);
-    context.fillRect(rightPaddleX, rightPaddleY, grid, paddleHeight);
+    context.fillRect(
+      leftPaddleX,
+      leftPaddleY + paddleHeight / 4,
+      grid,
+      paddleHeight
+    );
+    context.fillRect(
+      rightPaddleX,
+      rightPaddleY + paddleHeight / 4,
+      grid,
+      paddleHeight
+    );
 
     // Draw ball
     context.fillRect(ballX, ballY, grid, grid);

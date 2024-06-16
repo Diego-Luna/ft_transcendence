@@ -11,15 +11,15 @@ class Game:
     def __init__(self, game_id, play_mode):
         self.game_id = game_id
         self.play_mode = play_mode
-        self.left_paddle_x = 5  # Define the left paddle's x-coordinate
+        self.left_paddle_x = 0  # Adjusted for edge position
         self.left_paddle_y = 50
-        self.right_paddle_x = 94  # Define the right paddle's x-coordinate
+        self.right_paddle_x = 100  # Adjusted for edge position
         self.right_paddle_y = 50
         self.ball_x = 50
         self.ball_y = 50
-        angle = math.radians(35)  # Convert 30 degrees to radians
-        self.ball_dx = math.cos(angle) * 0.5  # Adjust speed here
-        self.ball_dy = math.sin(angle) * 0.5  # Adjust speed here
+        angle = math.radians(35)  # Convert 35 degrees to radians
+        self.ball_dx = math.cos(angle) * 0.7  # Adjust speed here
+        self.ball_dy = math.sin(angle) * 0.7  # Adjust speed here
         self.left_score = 0
         self.right_score = 0
         self.winner = None
@@ -27,26 +27,17 @@ class Game:
         self.loop_running = False  # Flag to indicate if the game loop is running
         self.left_paddle_movement = 0
         self.right_paddle_movement = 0
-        self.MOVEMENT_SPEED = 1.5
+        self.MOVEMENT_SPEED = 1
 
     def detect_collisions(self):
         # Check collision with left paddle
-        if (
-            self.ball_x <= self.left_paddle_x + 0.2  # Adjust collision margin
-            and abs(self.left_paddle_y - self.ball_y) <= 10
-        ):
-            self.ball_x = (
-                self.left_paddle_x + 1
-            )  # Prevent ball from going inside paddle
+        if self.ball_dx < 0 and self.ball_x <= self.left_paddle_x + 1 and abs(self.left_paddle_y - self.ball_y) <= 12:
+            self.ball_x = self.left_paddle_x + 1  # Prevent ball from going inside paddle
             self.ball_dx *= -1
+        
         # Check collision with right paddle
-        if (
-            self.ball_x >= self.right_paddle_x - 1  # Adjust collision margin
-            and abs(self.right_paddle_y - self.ball_y) <= 10
-        ):
-            self.ball_x = (
-                self.right_paddle_x - 1
-            )  # Prevent ball from going inside paddle
+        if self.ball_dx > 0 and self.ball_x >= self.right_paddle_x - 1 and abs(self.right_paddle_y - self.ball_y) <= 12:
+            self.ball_x = self.right_paddle_x - 1  # Prevent ball from going inside paddle
             self.ball_dx *= -1
 
         # Check collision with top and bottom walls
@@ -63,12 +54,8 @@ class Game:
         self.left_paddle_y = max(0, min(self.left_paddle_y, 100))
         self.right_paddle_y = max(0, min(self.right_paddle_y, 100))
 
-        # Check and handle ball collisions with the paddles
+        # Check and handle ball collisions with the paddles and walls
         self.detect_collisions()
-
-        # Handle boundary collisions with the field/canvas
-        if self.ball_y <= 0 or self.ball_y >= 100:
-            self.ball_dy *= -1
 
         # Handle scoring
         if self.ball_x <= 0:
@@ -93,6 +80,14 @@ class Game:
             self.left_paddle_movement = self.MOVEMENT_SPEED
         elif direction == "left_stop":
             self.left_paddle_movement = 0
+        
+        # Ensure the left paddle does not move beyond the top and bottom borders
+        if self.left_paddle_y + self.left_paddle_movement < 2:
+            self.left_paddle_y = 2
+            self.left_paddle_movement = 0
+        elif self.left_paddle_y + self.left_paddle_movement > 92:
+            self.left_paddle_y = 92
+            self.left_paddle_movement = 0
 
     def paddle_move_right(self, direction):
         if direction == "right_up":
@@ -100,6 +95,14 @@ class Game:
         elif direction == "right_down":
             self.right_paddle_movement = self.MOVEMENT_SPEED
         elif direction == "right_stop":
+            self.right_paddle_movement = 0
+        
+        # Ensure the right paddle does not move beyond the top and bottom borders
+        if self.right_paddle_y + self.right_paddle_movement < 2:
+            self.right_paddle_y = 2
+            self.right_paddle_movement = 0
+        elif self.right_paddle_y + self.right_paddle_movement > 92:
+            self.right_paddle_y = 92
             self.right_paddle_movement = 0
 
     def get_state(self):
@@ -223,7 +226,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = GameConsumer.games.get(game_id)  # Not from database
 
         while True:
-            await asyncio.sleep(1 / 60)  # 60 FPS
+            await asyncio.sleep(1 / 90)  # 90 FPS
 
             if game.winner:
                 state = game.get_state()
