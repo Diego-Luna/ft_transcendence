@@ -8,16 +8,16 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # We copy the requirements files first to take advantage of Docker's layer cache.
-COPY ./cabraping.be/pip_environment_dependencies.txt /app/
+COPY ./pip_environment_dependencies.txt /app/
 
 # We install the project dependencies
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r pip_environment_dependencies.txt
 
 # We copy the rest of the project source code to the container.
-COPY ./cabraping.be /app
+COPY ./ /app
 
-COPY ./cabraping.be/entrypoint.sh /app/
+COPY ./entrypoint.sh /app/
 
 # Ensure that the input script is executable
 RUN chmod +x /app/entrypoint.sh
