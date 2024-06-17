@@ -1,23 +1,18 @@
-# Using a Node.js base image
-FROM node:16-alpine
+# Usando una imagen base de Nginx para servir archivos estáticos
+FROM nginx:alpine
 
-# Set the working directory in the container
-WORKDIR /app
+# Copiar archivos estáticos al directorio de Nginx
+COPY ./src /usr/share/nginx/html
 
-# Copy the file 'package.json' and 'package-lock.json' (if available)
-# COPY ./cabraping.fe/package*.json ./
+# Copiar la página de error 404
+COPY ./404.html /usr/share/nginx/html
 
-# Install project dependencies
-RUN npm install -g serve
+# Copiar configuración de nginx
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copying the rest of the project source code to the container
-COPY ./cabraping.fe .
+# Copiar certificados SSL
+COPY ssl /etc/nginx/ssl
 
-# Build the application for production
-# RUN npm run build
-
-# Expose the port used by your application
-EXPOSE 8080
-
-# Command to serve the application using a simple HTTP server to serve static files.
-CMD ["npx", "serve", "-s", "src", "-l", "8080"]
+# Exponer puertos necesarios
+EXPOSE 80
+EXPOSE 443

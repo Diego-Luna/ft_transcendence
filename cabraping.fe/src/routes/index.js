@@ -86,9 +86,9 @@ const router = async () => {
   Header_js();
 
   user_location = location.hash.slice(1).toLocaleLowerCase().split("/");
-  
+
   await check_global_before();
-  
+
   if (location.pathname !== "/")
   {
     window.location.pathname = '/';
