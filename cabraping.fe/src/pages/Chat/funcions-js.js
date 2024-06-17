@@ -199,7 +199,7 @@ async function inviteGame(jwt) {
   let currentTournamentId = localStorage.getItem("currentTournamentId");
   if (currentTournamentId)
   {
-    console.log("currentTournamentId:", currentTournamentId);
+    // console.log("currentTournamentId:", currentTournamentId);
     const acceptGameButtonButton = document.getElementById('acceptGameButton');
     if (acceptGameButtonButton) acceptGameButtonButton.disabled = true;
     showNotification("You created a tournament", "warning");

@@ -500,7 +500,7 @@ async function execute_processes_by_category_message(message, myUser) {
                     showNotification(`The grand final you will be with ${message.user_name} starting in 3 seconds...`, "info");
                 }
                 localStorage.setItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`, true);
-                console.log(">> message.user_id:", message.user_id);
+                // console.log(">> message.user_id:", message.user_id);
                 sendFinalOftTournamentNotifications(getUserIdFromJWT(), localStorage.getItem('username'), message.user_id);
                 await timeout(3000);
                 sendGameAcceptTournament_final_Waiting(message.dest_user_id, message.user_id, myUser);

@@ -140,7 +140,7 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
             }
         }
         else{
-            console.log("finish");
+            // console.log("finish");
             // console.log("soy el ganador y voy a terminar el tournament");
             localStorage.setItem(`system_Tournament_status_${tournament_id}`, "no");
             update_winner_of_tournament(tournament_id, winner);
@@ -155,7 +155,7 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
     {
         if (!localStorage.getItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`))
         {
-            console.log("run");
+            // console.log("run");
             showNotification("You are going to be in the grand final. Waiting for the competitor...", "info");
         }
         localStorage.setItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`, true);
