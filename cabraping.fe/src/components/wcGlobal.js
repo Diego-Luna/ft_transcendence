@@ -317,7 +317,7 @@ export function Tournament_check_notificacion() {
         let tournament_data = localStorage.getItem(`system_tournament_name_${tournamentId}_data`);
         const success = await updateInviteStatus(tournamentId, true, getUserIdFromJWT());
 
-        if (!success)
+        if (!success || !tournament_data || !tournament_data.user_name)
             return
 
 
@@ -348,7 +348,7 @@ export function Tournament_check_notificacion() {
         let tournament_data = localStorage.getItem(`system_tournament_name_${tournamentId}_data`);
         const success = await updateInviteStatus(tournamentId, false, getUserIdFromJWT());
 
-        if (!success)
+        if (!success || !tournament_data || !tournament_data.user_name)
             return
 
         //console.log("😆 updateInviteStatus:", success);
