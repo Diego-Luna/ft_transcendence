@@ -19,6 +19,9 @@ class ChannelCreateView(APIView):
         serializer = ChannelCreateSerializer(data=request.data)
         if serializer.is_valid():
             members = serializer.validated_data.get('members')  # Esto debería ser una lista de instancias de CustomUser
+            
+            if len(members) == 1:
+                return Response({"error": "You need to select a person."}, status=status.HTTP_201_CREATED)
 
             # Paso 1: Encuentra canales que tengan alguno de los miembros dados
             potential_duplicate_channels = Channel.objects.filter(members__in=members).distinct()
@@ -31,13 +34,13 @@ class ChannelCreateView(APIView):
 
                 if channel_member_ids == given_member_ids:
                     # Encontramos un canal duplicado
-                    return Response({"error": "A channel with the exact same members already exists."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"error": "A channel with the exact same members already exists."}, status=status.HTTP_201_CREATED)
 
             # Si no se encuentra un canal duplicado, procede a crear el nuevo canal
             channel = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_201_CREATED)
 
 
 class UserChannelsView(ListAPIView):

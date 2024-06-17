@@ -207,6 +207,7 @@ async function hasPendingOrAcceptedGames(userId) {
 
     const games = await response.json();
     return games.some(game =>
+        game.playMode === 2 &&
         (game.invitee.id === userId || game.inviter.id === userId) &&
         (game.invitationStatus === "PENDING" || game.invitationStatus === "ACCEPTED")
     );
@@ -339,6 +340,23 @@ export function sendFinalOftTournamentNotifications(userId, userName, destUserId
     WSsocket.send(JSON.stringify(message));
 }
 
+export function sendFinishTournamentNotifications(userId) {
+    if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
+        //console.log('WebSocket is not connected');
+        return;
+    }
+
+    const message = {
+        type: "notify",
+        message: `system_Tournament_${localStorage.getItem("currentTournamentId")}_finish`,
+        user_id: String(userId),
+        user_name: "name",
+        dest_user_id: 0
+    };
+
+    WSsocket.send(JSON.stringify(message));
+}
+
 // Función para enviar un mensaje específico al WebSocket
 export function sendGameCancelTournamentNotifications(userId, userName, destUserId) {
     if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
@@ -368,6 +386,23 @@ export function sendWinnerOfGameTournamentNotifications(userId, userName, text) 
         type: "notify",
         message: text,
         user_id: String(userId),
+        user_name: userName,
+        dest_user_id: 0
+    };
+
+    WSsocket.send(JSON.stringify(message));
+}
+
+export function userUpdateNotifications(userName) {
+    if (!WSsocket || WSsocket.readyState !== WebSocket.OPEN) {
+        //console.log('WebSocket is not connected');
+        return;
+    }
+
+    const message = {
+        type: "notify",
+        message: "user_update",
+        user_id: String(getUserIdFromJWT()),
         user_name: userName,
         dest_user_id: 0
     };

@@ -1,5 +1,6 @@
 import { validateAndSanitizeInput } from '../../components/security.js';
 import { showNotification } from '../../components/showNotification.js';
+import { userUpdateNotifications } from '../../components/wcGlobal-funcions-send-message.js';
 import { BACKEND_URL } from '../../components/wcGlobal.js';
 import { getHash } from '../../utils/getHash.js';
 
@@ -123,7 +124,10 @@ function FormSendData(event) {
       if (data.error)
         showNotification("This name is used", "error");
       else
+      {
         showNotification("User successfully updated", "success");
+        userUpdateNotifications(username);
+      }
       updateInfo();
     })
     .catch((error) => {

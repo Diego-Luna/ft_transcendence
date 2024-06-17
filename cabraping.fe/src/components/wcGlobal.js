@@ -15,6 +15,8 @@ import { Cancel_a_Game, checkAcceptedGames, getDifference_in_array } from "../pa
 import { gameSocket } from "../pages/Game/funcions-js.js";
 import { getTournamentForId } from "../pages/Tournament/cancel.js";
 import { timeout } from "./utils.js";
+import { getLocalhostSystem_game_on, setLocalhostSystem_game_on } from "../pages/Game/utils.js";
+import { Matching_js } from "../pages/Matching/funcions-js.js";
 
 const frontendURL = new URL(window.location.href);
 const serverIPAddress = frontendURL.hostname;
@@ -218,6 +220,9 @@ async function updateInviteStatus(tournamentId, accepted, currentUserId) {
     //console.log("🚨🚨updateInviteStatus🚨🚨:", tournamentId, ", accepted:", accepted);
 
     const participants = await fetchParticipants(tournamentId);
+
+    if (!participants)
+        return;
     //console.log("🚨🚨>participants:", participants);
     // const currentUserId = localStorage.getItem('userId');
     // const currentUserId = getUserIdFromJWT();
@@ -265,6 +270,10 @@ async function updateInviteStatus(tournamentId, accepted, currentUserId) {
 
 export async function fetchParticipants(tournamentId) {
     try {
+        if (!tournamentId || tournamentId === null)
+        {
+            return null
+        }
         const response = await fetch(`${BACKEND_URL}/api/tournaments/${tournamentId}/`, {
             headers: {
                 'Authorization': `Bearer ${getToken()}`,
@@ -308,6 +317,9 @@ export function Tournament_check_notificacion() {
         let tournament_data = localStorage.getItem(`system_tournament_name_${tournamentId}_data`);
         const success = await updateInviteStatus(tournamentId, true, getUserIdFromJWT());
 
+        if (!success)
+            return
+
 
         if (!activeWebSockets[tournamentId] || activeWebSockets[tournamentId].readyState === WebSocket.CLOSED) {
             connectTournamentWebSocket(tournamentId);
@@ -335,6 +347,9 @@ export function Tournament_check_notificacion() {
         let tournamentId = localStorage.getItem(`currentTournamentId`);
         let tournament_data = localStorage.getItem(`system_tournament_name_${tournamentId}_data`);
         const success = await updateInviteStatus(tournamentId, false, getUserIdFromJWT());
+
+        if (!success)
+            return
 
         //console.log("😆 updateInviteStatus:", success);
 
@@ -468,7 +483,10 @@ async function execute_processes_by_category_message(message, myUser) {
                 //console.log("-> system-tournament - final showNotificationPopup myUser:", myUser,);
                 //console.log("-> system-tournament - final showNotificationPopup message.dest_user_id:", message.dest_user_id, ", message.user_id:", message.user_id);
                 // diego - aceptarjuego
-                showNotification(`The grand final you will be with ${message.user_name} starting in 3 seconds...`, "info");
+                if (localStorage.getItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`) !== true)
+                {
+                    showNotification(`The grand final you will be with ${message.user_name} starting in 3 seconds...`, "info");
+                }
                 localStorage.setItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`, true);
                 console.log(">> message.user_id:", message.user_id);
                 sendFinalOftTournamentNotifications(getUserIdFromJWT(), localStorage.getItem('username'), message.user_id);
@@ -482,7 +500,14 @@ async function execute_processes_by_category_message(message, myUser) {
         case "accepted_game":
             // console.log("💩 accepted_game:", message);
             Chat_Update_js();
-            window.location.href = `/#game/${message.message}`;
+            // let number_of_games =  getLocalhostSystem_game_on();
+            // if (!number_of_games)
+            // {
+                window.location.href = `/#game/${message.message}`;
+            // }else
+            // {
+                // setLocalhostSystem_game_on(number_of_games + 1)
+            // }
             break;
         default:
             await run_processes_per_message(message);
@@ -516,7 +541,7 @@ async function run_processes_per_message(message) {
             break;
         case "Cancel Game":
             try {
-                if (gameSocket.readyState === 1) {
+                if (gameSocket.readyState && gameSocket.readyState === 1) {
                     gameSocket.close();
                 }
                 await Cancel_a_Game(localStorage.getItem("system_game_id"));
@@ -634,6 +659,12 @@ export async function connectWebSocketGlobal() {
                 break;
         }
 
+        if ((message.dest_user_id === "0" || message.dest_user_id === 0) && message.message === "user_update")
+        {
+            Chat_Update_js()
+            Friends_js();
+            Users_js();
+        }
         Torunament_game_diego(message);
 
 
@@ -661,6 +692,19 @@ async function Torunament_game_diego(message) {
 
         let tournament_id = localStorage.getItem("currentTournamentId");
 
+        if (`system_Tournament_${tournament_id}_finish` === message.message){
+            Chat_Update_js();
+            Matching_js();
+            showNotification("The Tournament its finish", "info");
+            // localStorage.getItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`)
+            localStorage.removeItem(`system_Tournament_status_${localStorage.getItem("currentTournamentId")}`);
+            localStorage.removeItem(`system_Tournament_status_${localStorage.getItem("currentTournamentId")}_final`);
+            localStorage.removeItem(`system_tournament_name_${localStorage.getItem("currentTournamentId")}`);
+            localStorage.removeItem(`system_tournament_name_${localStorage.getItem("currentTournamentId")}_data`);
+            localStorage.removeItem(`system_Tournament_status_${localStorage.getItem("currentTournamentId")}_final`);
+            localStorage.removeItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`);
+            localStorage.removeItem(`system_Tournament_${localStorage.getItem("currentTournamentId")}_winner`);
+        }
         if (`system_Tournament_${tournament_id}` === message.message){
             system_invite_game_Tournament();
         }
@@ -718,6 +762,7 @@ async function sendGameAccept_Waiting(userId, dest_user_id, myUser) {
 
     const game = games.find(
         (game) =>
+            game.playMode === 2 &&
             game.invitee.id === Number(userId) &&
             game.inviter.id === Number(dest_user_id) &&
             game.invitationStatus === "PENDING"

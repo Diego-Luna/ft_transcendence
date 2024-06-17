@@ -3,6 +3,7 @@ import { getToken } from "../../utils/get-token.js";
 import { getHash } from "../../utils/getHash.js";
 import { getUserIdFromJWT } from "../Chat/funcions-js.js";
 import { Send_data_bacnd_the_winner } from "./tournament-logic.js";
+import { getLocalhostSystem_game_on, next_game, setLocalhostSystem_game_on } from "./utils.js";
 
 
 export let gameSocket;
@@ -80,6 +81,13 @@ export async function Game_js() {
   // Don't do anything if the game is finished
   if (responseGame.status !== 200 || game.invitationStatus === "FINISHED")
     return;
+
+
+  // Diego Waitn for the next game
+  // if (!getLocalhostSystem_game_on())
+  // {
+  //   setLocalhostSystem_game_on(1);
+  // }
 
   /**
    * The game real-time connection
@@ -318,6 +326,8 @@ export async function Game_js() {
       // Diego - save data in the banckend
       // setTimeout( async () =>  {
         await Send_data_bacnd_the_winner(game.inviter.id, game.invitee.id, winnerId);
+
+        // await next_game();
       // }, Math.floor((Math.random() * 300 ) + getUserIdFromJWT() ));
       // Diego - sen the winner
 

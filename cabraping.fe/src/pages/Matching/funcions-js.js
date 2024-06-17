@@ -19,6 +19,11 @@ export async function Matching_js() {
     const button = document.getElementById('start-matching-button');
     const statusDiv = document.getElementById('matching-status');
 
+    if (!statusDiv || !button)
+    {
+        return
+    }
+
     // Verificar el estado de las invitaciones
     const responseGames = await fetch(`${BACKEND_URL}/api/games/`, {
         headers: { Authorization: `Bearer ${jwt}` },

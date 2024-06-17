@@ -35,6 +35,7 @@ import { getToken } from "../utils/get-token.js";
 import { getTournamentForId } from "../pages/Tournament/cancel.js";
 import { Cancel_a_Game } from "../pages/Game/cancel.js";
 import { sendDeleteMeForMatchedMessage, sendGameCancelTournamentNotifications } from "../components/wcGlobal-funcions-send-message.js";
+import { getLocalhostSystem_game_on, GetSpecificGame, setLocalhostSystem_game_on } from "../pages/Game/utils.js";
 
 const routes = {
   "/": [Home_html, Home_js],
@@ -57,7 +58,25 @@ const routes = {
   "/404": [Error404_html, Error404_js],
 };
 
+let user_location;
+
 const router = async () => {
+
+  const jwt = localStorage.getItem("jwt");
+
+  // Check the JWT
+  if (jwt) {
+    try {
+       let response = await fetch(`${BACKEND_URL}/api/me/`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!response.ok)
+        localStorage.clear();
+    } catch (error) {
+      localStorage.clear();
+    }
+  }
+
   const header = document.getElementById("header");
   const footer = document.getElementById("footer");
   const content = document.getElementById("content");
@@ -66,8 +85,31 @@ const router = async () => {
   header.innerHTML = await Header_html();
   Header_js();
 
-  let user_location = location.hash.slice(1).toLocaleLowerCase().split("/");
+  user_location = location.hash.slice(1).toLocaleLowerCase().split("/");
+  
+  await check_global_before();
+  
+  if (location.pathname !== "/")
+  {
+    window.location.pathname = '/';
+  }
+
   let render = resolveRoutes(routes, user_location);
+
+
+  content.innerHTML = await render[0]();
+  if (render.length > 1) {
+    for (let i = 1; i < render.length; i++) {
+      if (render[i]) {
+        await render[i]();
+      }
+    }
+  }
+
+  await check_global_after();
+};
+
+async function check_global_before(params) {
 
   await WS_check_the_torunament_pending();
 
@@ -100,18 +142,23 @@ const router = async () => {
   }
 
   // console.log("🐹 localStorage.getItem(system_game_id):", localStorage.getItem("system_game_id"));
-  if (localStorage.getItem("system_game_id") || (localStorage.getItem("currentTournamentId") && localStorage.getItem("system_game_id")) )
+  if (user_location[0] !== "game" && (localStorage.getItem("system_game_id") || (localStorage.getItem("currentTournamentId") && localStorage.getItem("system_game_id"))) )
     {
       if (localStorage.getItem("currentTournamentId"))
       {
         CancelTournament_for_descconecte_();
       }else{
-        if (gameSocket)
+        let game_specific = await GetSpecificGame(localStorage.getItem("system_game_id"));
+        if (game_specific.playMode === 2)
         {
-          gameSocket.close()
+          if (gameSocket)
+          {
+            gameSocket.close()
+          }
+          // setLocalhostSystem_game_on(getLocalhostSystem_game_on() - 1)
+          let send_notificaque = await Cancel_a_Game(localStorage.getItem("system_game_id"));
+          sendGameCancelTournamentNotifications(getUserIdFromJWT(), localStorage.getItem('username'), send_notificaque);
         }
-        let send_notificaque = await Cancel_a_Game(localStorage.getItem("system_game_id"));
-        sendGameCancelTournamentNotifications(getUserIdFromJWT(), localStorage.getItem('username'), send_notificaque);
         localStorage.removeItem("system_game_id");
       }
   }
@@ -121,20 +168,17 @@ const router = async () => {
     // sendDeleteMeForMatchedMessage
     sendDeleteMeForMatchedMessage();
   }
+}
 
-  content.innerHTML = await render[0]();
-  if (render.length > 1) {
-    for (let i = 1; i < render.length; i++) {
-      if (render[i]) {
-        await render[i]();
-      }
-    }
-  }
+async function check_global_after(params) {
 
   if (user_location[0] !== 'chat') {
     await Chat_Update_js();
   }
   await connectWebSocketGlobal();
-};
+}
+
+
 
 export default router;
+

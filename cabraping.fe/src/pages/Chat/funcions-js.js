@@ -255,6 +255,10 @@ async function inviteGame(jwt) {
 
   async function checkRequestGame() {
 
+    // console.log("> channel_now:",channel_now);
+    if (channel_now === "/")
+      return
+
     const jwt = localStorage.getItem('jwt');
     if (!jwt || communication_user_id == -1) {
         return;
@@ -271,6 +275,7 @@ async function inviteGame(jwt) {
 
     const game = games.find(
       (game) =>
+        game.playMode === 2 &&
         game.invitationStatus === "PENDING" &&
         (game.invitee.id === my_id ||
         game.inviter.id === my_id)
@@ -286,6 +291,7 @@ async function inviteGame(jwt) {
     // ACCEPTED game
     const game_ACCEPTED = games.find(
       (game) =>
+        game.playMode === 2 &&
         game.invitee.id === my_id &&
         game.inviter.id === communication_user_id &&
         game.invitationStatus === "ACCEPTED"
@@ -298,6 +304,7 @@ async function inviteGame(jwt) {
     // send notificacion
     const game_pending = games.find(
       (game) =>
+        game.playMode === 2 &&
         game.invitee.id === my_id &&
         game.inviter.id === communication_user_id &&
         game.invitationStatus === "PENDING"
@@ -673,9 +680,6 @@ function updateChannelList(channels) {
 function switchChannel(newChannelId) {
   // Update the current channel
   channel_now = newChannelId;
-
-  // console.log(" <<<<<<< channel_now:", channel_now);
-
   // Clear the chat messages from the UI
 
   const inviteGameButtonButton = document.getElementById('inviteGameButton');
@@ -755,12 +759,20 @@ function loadMessagesFromLocalStorage(channelId) {
   const messages = JSON.parse(localStorage.getItem(`messages_channel_${channelId}`)) || [];
   const messageList = document.getElementById('messageList');
 
+
+  let check_channel = channels.find((channel_check) => channel_check.id === channel_now);
+  let members_channel =  check_channel.members;
+
   messages.forEach(message => {
+    // userImage.src = `${message.userDetails.avatarImageURL}`;
+
+      let data_user = members_channel.find((data) => data.id === message.userDetails.id)
+
       const messageDiv = document.createElement('div');
       messageDiv.className = 'mb-3 d-flex align-items-start';
 
       const userImage = document.createElement('img');
-      userImage.src = `${message.userDetails.avatarImageURL}`;
+      userImage.src = `${data_user.avatarImageURL}`;
       userImage.alt = 'User Image';
       userImage.className = 'rounded-circle mr-2';
       userImage.width = 40;
@@ -769,7 +781,7 @@ function loadMessagesFromLocalStorage(channelId) {
       const messageContent = document.createElement('div');
 
       const messageUsername = document.createElement('strong');
-      messageUsername.textContent = message.UserName;
+      messageUsername.textContent = data_user.UserName;
       const messageText = document.createElement('p');
       messageText.textContent = message.message;
 
@@ -922,7 +934,7 @@ function handleSaveChannelClick() {
         // sendChannelCreatedMessage
         sendChannelCreatedNotifications(user_id, UserName, selectedUsersMember[0])
       } else {
-        showNotification("Error there is already a chat", "error");
+        showNotification(data.error, "error");
       }
 
       // Cierra el modal

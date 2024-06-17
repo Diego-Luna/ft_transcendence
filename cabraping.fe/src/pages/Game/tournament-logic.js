@@ -1,6 +1,6 @@
 import { showNotification, showNotificationPopup } from "../../components/showNotification.js";
 import { timeout } from "../../components/utils.js";
-import { sendGameInitiate_Waiting, sendGameInviteNotifications, sendGameInviteTournamentNotifications, sendWinnerOfGameTournamentNotifications } from "../../components/wcGlobal-funcions-send-message.js";
+import { sendFinishTournamentNotifications, sendGameInitiate_Waiting, sendGameInviteNotifications, sendGameInviteTournamentNotifications, sendWinnerOfGameTournamentNotifications } from "../../components/wcGlobal-funcions-send-message.js";
 import { BACKEND_URL } from "../../components/wcGlobal.js";
 import { getToken } from "../../utils/get-token.js";
 import { getUserIdFromJWT } from "../Chat/funcions-js.js";
@@ -144,6 +144,7 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
             // console.log("soy el ganador y voy a terminar el tournament");
             localStorage.setItem(`system_Tournament_status_${tournament_id}`, "no");
             update_winner_of_tournament(tournament_id, winner);
+            sendFinishTournamentNotifications(getUserIdFromJWT());
         }
 
 
@@ -152,7 +153,11 @@ export async function Send_data_bacnd_the_winner(first_player, secong_player, wi
 
     if (localStorage.getItem("currentTournamentId"))
     {
-        showNotification("You are going to be in the grand final. Waiting for the competitor...", "info");
+        if (!localStorage.getItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`))
+        {
+            console.log("run");
+            showNotification("You are going to be in the grand final. Waiting for the competitor...", "info");
+        }
         localStorage.setItem(`final_tournametn_${localStorage.getItem("currentTournamentId")}`, true);
         await timeout(1000);
     }
