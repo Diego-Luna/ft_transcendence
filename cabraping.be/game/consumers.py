@@ -25,11 +25,18 @@ class Paddle:
 
     def update(self, max_height):
         self.y += self.movement
-        self.y = max(0, min(self.y, max_height - Paddle.HEIGHT))
+
+        # Ensure the paddle does not move above the top boundary
+        if self.y < 2:
+            self.y = 0
+
+        # Ensure the paddle does not move below the bottom boundary
+        if self.y > max_height - Paddle.HEIGHT - 2:
+            self.y = max_height - Paddle.HEIGHT
 
 class Ball:
     RADIUS = 2
-    SPEED = 1.5
+    SPEED = 2
 
     def __init__(self, x, y):
         self.x = x
@@ -54,12 +61,12 @@ class Ball:
             self.dy *= -1
 
         if self.dx < 0 and self.x - Ball.RADIUS <= paddle_left.x + Paddle.WIDTH:
-            if paddle_left.y <= self.y <= paddle_left.y + Paddle.HEIGHT:
+            if paddle_left.y - 3 <= self.y <= paddle_left.y + Paddle.HEIGHT:
                 self.x = paddle_left.x + Paddle.WIDTH + Ball.RADIUS
                 self.dx *= -1
 
         if self.dx > 0 and self.x + Ball.RADIUS >= paddle_right.x:
-            if paddle_right.y <= self.y <= paddle_right.y + Paddle.HEIGHT:
+            if paddle_right.y - 3 <= self.y <= paddle_right.y + Paddle.HEIGHT:
                 self.x = paddle_right.x - Ball.RADIUS
                 self.dx *= -1
 
@@ -85,10 +92,10 @@ class Game:
         self.paddle_right.update(Game.HEIGHT)
         self.ball.detect_collision(self.paddle_left, self.paddle_right, Game.WIDTH, Game.HEIGHT)
 
-        if self.ball.x - Ball.RADIUS <= 0:
+        if self.ball.x - Ball.RADIUS + 1 <= 0:
             self.right_score += 1
             self.ball.reset(Game.WIDTH, Game.HEIGHT)
-        elif self.ball.x + Ball.RADIUS >= Game.WIDTH:
+        elif self.ball.x + Ball.RADIUS - 1>= Game.WIDTH:
             self.left_score += 1
             self.ball.reset(Game.WIDTH, Game.HEIGHT)
 
@@ -211,7 +218,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = GameConsumer.games.get(game_id)
 
         while True:
-            await asyncio.sleep(1 / 60)  # 60 FPS
+            await asyncio.sleep(1 / 70)  # 60 FPS
 
             if game.winner:
                 state = game.get_state()

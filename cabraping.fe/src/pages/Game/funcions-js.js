@@ -281,9 +281,9 @@ export async function Game_js() {
     const canvasHeight = canvasElement.height;
 
     leftPaddle.y =
-      (state.left_paddle_y / 100) * (canvasHeight - paddleHeight) + 10;
+      (state.left_paddle_y / 100) * (canvasHeight - paddleHeight) + 8;
     rightPaddle.y =
-      (state.right_paddle_y / 100) * (canvasHeight - paddleHeight) + 10;
+      (state.right_paddle_y / 100) * (canvasHeight - paddleHeight) + 8;
     ball.x = (state.ball_x / 100) * canvasWidth;
     ball.y = (state.ball_y / 100) * canvasHeight;
 
