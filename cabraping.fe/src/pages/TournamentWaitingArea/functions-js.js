@@ -54,11 +54,9 @@ function updateStartButton(participants) {
                     return;
                 }
 
-                console.log("> startButton.disabled:", startButton.disabled);
                 startButton.disabled = true;
                 const cancelButton = document.getElementById('cancelTournamentButton');
                 if (cancelButton) cancelButton.disabled = true
-                console.log("< startButton.disabled:", startButton.disabled);
                 try {
                     const response = await fetch(`${BACKEND_URL}/api/tournaments/${tournamentId}/update_status/`, {
                         method: 'PUT',

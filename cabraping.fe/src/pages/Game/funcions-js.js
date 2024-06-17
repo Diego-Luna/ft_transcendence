@@ -212,7 +212,7 @@ export async function Game_js() {
     }
 
     // Send movement data to server
-    if (gameSocket.readyState === 1)
+    if (gameSocket && gameSocket.readyState === 1)
     {
       gameSocket.send(
         JSON.stringify({

@@ -9,7 +9,11 @@ import { getUserIdFromJWT } from "../Chat/funcions-js.js";
 
 export async function Cancel_a_Game(gameId) {
 
+    if (!gameId)
+        return
+
     gameId = Number(gameId)
+
 
     // console.log("🐹🐹 Cancel_a_Game:", gameId);
 
