@@ -15,13 +15,11 @@ export async function Game_js() {
   const gameId = getHash();
   if (gameId === "/") return;
 
-  // Fetch the current user's ID
   const responseUser = await fetch(`${BACKEND_URL}/api/me/`, {
     headers: { Authorization: `Bearer ${jwt}` },
   });
   const myUserData = await responseUser.json();
 
-  // Fetch initial game data/details
   const responseGame = await fetch(`${BACKEND_URL}/api/games/`, {
     headers: { Authorization: `Bearer ${jwt}` },
   });
@@ -58,51 +56,38 @@ export async function Game_js() {
     ? `${game.winner.username} is the winner! 🎉`
     : "";
 
-  // Determine if the current user is the inviter or invitee
   const isLeftPlayer = myUserData.id === game.inviter.id;
   const isRightPlayer = myUserData.id === game.invitee.id;
 
-  // Update player names
   const leftPaddleNameElement = document.getElementById("left-paddle-name");
   const rightPaddleNameElement = document.getElementById("right-paddle-name");
   leftPaddleNameElement.innerText = game.inviter.username || "";
   rightPaddleNameElement.innerText = game.invitee.username || "";
 
-  // Update player scores
   const leftPaddleScoreElement = document.getElementById("left-paddle-score");
   const rightPaddleScoreElement = document.getElementById("right-paddle-score");
   leftPaddleScoreElement.innerText = game.inviterScore || 0;
   rightPaddleScoreElement.innerText = game.inviteeScore || 0;
 
-  // Don't do anything if the game is finished
   if (responseGame.status !== 200 || game.invitationStatus === "FINISHED")
     return;
-
-  /**
-   * The game real-time connection
-   */
 
   gameSocket = new WebSocket(
     `${WS_URL}/ws/game/${game.id}/?token=${jwt}&playMode=${game.playMode}`
   );
-  // Also provide the play_mode
 
   gameSocket.onopen = function (event) {
     // console.info("Game socket connected");
   };
 
-  // game loop, 60 FPS because the backend sent that much
   gameSocket.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log(data.message);
     renderGameState(data.message);
   };
 
   gameSocket.onclose = function (event) {
     if (event.wasClean) {
-      // console.info(
-      //   `Connection closed cleanly, code=${event.code}, reason=${event.reason}`
-      // );
+      // console.info(`Connection closed cleanly, code=${event.code}, reason=${event.reason}`);
     } else {
       // console.info("Game socket connection died");
     }
@@ -112,20 +97,35 @@ export async function Game_js() {
     // console.log(`WebSocket error: ${error.message}`);
   };
 
-  /**
-   * The actual game visuals here
-   */
-
   const canvasElement = document.getElementById("game");
   const context = canvasElement.getContext("2d");
 
-  // Drawings on the canvas
   const grid = 5;
-  const paddleHeight = grid * 5;
-  const maxPaddleY = canvasElement.height - grid - paddleHeight;
+  const paddleWidth = (grid * 2) / 2;
+  const paddleHeight = (grid * 12) / 2;
+  const ballRadius = (grid * 1.5) / 2;
 
-  document.addEventListener("keydown", handleKeyDown);
-  document.addEventListener("keyup", handleKeyUp);
+  const leftPaddle = {
+    x: grid * 2,
+    y: canvasElement.height / 2 - paddleHeight / 2,
+    width: paddleWidth,
+    height: paddleHeight,
+    dy: 0,
+  };
+  const rightPaddle = {
+    x: canvasElement.width - grid * 4,
+    y: canvasElement.height / 2 - paddleHeight / 2,
+    width: paddleWidth,
+    height: paddleHeight,
+    dy: 0,
+  };
+  const ball = {
+    x: canvasElement.width / 2,
+    y: canvasElement.height / 2,
+    radius: ballRadius,
+    dx: grid,
+    dy: grid,
+  };
 
   const KEYS = {
     W: 87,
@@ -134,117 +134,101 @@ export async function Game_js() {
     DOWN: 40,
   };
 
-  function handleKeyDown(e) {
-    let direction = null;
-
+  document.addEventListener("keydown", (e) => {
     if (game.playMode === 1) {
-      // W key
       if (e.which === KEYS.W) {
-        direction = "left_up";
-      }
-      // S key
-      if (e.which === KEYS.S) {
-        direction = "left_down";
-      }
-      // Up arrow key
-      if (e.which === KEYS.UP) {
-        direction = "right_up";
-      }
-      // Down arrow key
-      if (e.which === KEYS.DOWN) {
-        direction = "right_down";
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "left_up" })
+        );
+      } else if (e.which === KEYS.S) {
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "left_down" })
+        );
+      } else if (e.which === KEYS.UP) {
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "right_up" })
+        );
+      } else if (e.which === KEYS.DOWN) {
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "right_down" })
+        );
       }
     } else if (game.playMode === 2) {
       if (isLeftPlayer) {
-        // W key
         if (e.which === KEYS.W) {
-          direction = "left_up";
-        }
-        // S key
-        if (e.which === KEYS.S) {
-          direction = "left_down";
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "left_up" })
+          );
+        } else if (e.which === KEYS.S) {
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "left_down" })
+          );
         }
       } else if (isRightPlayer) {
-        // Up arrow key
         if (e.which === KEYS.UP) {
-          direction = "right_up";
-        }
-        // Down arrow key
-        if (e.which === KEYS.DOWN) {
-          direction = "right_down";
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "right_up" })
+          );
+        } else if (e.which === KEYS.DOWN) {
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "right_down" })
+          );
         }
       }
     }
+  });
 
-    if (direction && gameSocket) {
-      gameSocket.send(
-        JSON.stringify({
-          action: "move",
-          direction: direction,
-        })
-      );
-    }
-  }
-
-  function handleKeyUp(e) {
-    let direction = null;
-
+  document.addEventListener("keyup", (e) => {
     if (game.playMode === 1) {
-      // W or S key
       if (e.which === KEYS.W || e.which === KEYS.S) {
-        direction = "left_stop";
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "left_stop" })
+        );
       }
-      // Up or Down arrow key
       if (e.which === KEYS.UP || e.which === KEYS.DOWN) {
-        direction = "right_stop";
+        gameSocket.send(
+          JSON.stringify({ action: "move", direction: "right_stop" })
+        );
       }
     } else if (game.playMode === 2) {
       if (isLeftPlayer) {
-        // W or S key
         if (e.which === KEYS.W || e.which === KEYS.S) {
-          direction = "left_stop";
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "left_stop" })
+          );
         }
       } else if (isRightPlayer) {
-        // Up or Down arrow key
         if (e.which === KEYS.UP || e.which === KEYS.DOWN) {
-          direction = "right_stop";
+          gameSocket.send(
+            JSON.stringify({ action: "move", direction: "right_stop" })
+          );
         }
       }
     }
-
-    if (direction && gameSocket) {
-      gameSocket.send(
-        JSON.stringify({
-          action: "move",
-          direction: direction,
-        })
-      );
-    }
-  }
+  });
 
   async function renderGameState(state) {
-    // Update scores
     leftPaddleScoreElement.innerText = state.left_score || 0;
     rightPaddleScoreElement.innerText = state.right_score || 0;
 
     if (!localStorage.getItem("system_game_id")) {
-      gameSocket.close();
+      if (gameSocket.readyState === 1) {
+        gameSocket.close();
+      }
 
-      // Optionally remove event listeners to prevent further key inputs
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
       return;
     }
 
     if (state.winner) {
-      // Close the WebSocket connection
-      gameSocket.close();
+      if (gameSocket.readyState === 1) {
+        gameSocket.close();
+      }
 
-      // Optionally remove event listeners to prevent further key inputs
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
 
-      // Announce the winner and stop the game
       const winner =
         state.winner === "left"
           ? game.inviter
@@ -282,62 +266,45 @@ export async function Game_js() {
       const result = await response.json();
       localStorage.removeItem("system_game_id");
 
-      // Save data in the backend
-      setTimeout(async () => {
-        await Send_data_bacnd_the_winner(
-          game.inviter.id,
-          game.invitee.id,
-          winnerId
-        );
-      }, Math.floor(Math.random() * 300));
+      await Send_data_bacnd_the_winner(
+        game.inviter.id,
+        game.invitee.id,
+        winnerId
+      );
 
-      return; // Stop further rendering
+      return;
     }
 
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    // Calculate actual pixel positions based on canvas dimensions
     const canvasWidth = canvasElement.width;
     const canvasHeight = canvasElement.height;
-    const paddleHeight = grid * 5;
-
-    const leftPaddleX = 0; // Position at the very left edge
-    const rightPaddleX = canvasWidth - grid; // Position at the very right edge
 
     const leftPaddleY =
       (state.left_paddle_y / 100) * (canvasHeight - paddleHeight);
     const rightPaddleY =
       (state.right_paddle_y / 100) * (canvasHeight - paddleHeight);
-
     const ballX = (state.ball_x / 100) * canvasWidth;
     const ballY = (state.ball_y / 100) * canvasHeight;
 
-    // Draw paddles
     context.fillStyle = "white";
+    context.fillRect(leftPaddle.x, leftPaddleY, leftPaddle.width, paddleHeight);
     context.fillRect(
-      leftPaddleX,
-      leftPaddleY + paddleHeight / 4,
-      grid,
+      rightPaddle.x,
+      rightPaddleY,
+      rightPaddle.width,
       paddleHeight
     );
-    context.fillRect(
-      rightPaddleX,
-      rightPaddleY + paddleHeight / 4,
-      grid,
-      paddleHeight
-    );
+    context.beginPath();
+    context.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+    context.fill();
 
-    // Draw ball
-    context.fillRect(ballX, ballY, grid, grid);
-
-    // Draw the field borders
     context.fillStyle = "lightgrey";
     context.fillRect(0, 0, canvasWidth, grid);
-    context.fillRect(0, canvasHeight - grid, canvasWidth, canvasHeight);
+    context.fillRect(0, canvasHeight - grid, canvasWidth, grid);
 
-    // Draw the middle dotted line
-    for (let i = grid; i < canvasHeight - grid; i += grid * 2) {
-      context.fillRect(canvasWidth / 2 - grid / 2, i, grid, grid);
+    for (let i = grid; i < canvasHeight - grid; i += grid * 3) {
+      context.fillRect(canvasWidth / 2 - grid / 2, i, grid, grid * 1.5);
     }
   }
 }

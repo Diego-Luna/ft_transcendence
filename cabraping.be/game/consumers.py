@@ -1,25 +1,29 @@
 import json
 import asyncio
 import math
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 from urllib.parse import parse_qs
 
-
 class Game:
+    WIDTH = 100
+    HEIGHT = 100
+    PADDLE_WIDTH = 2  # Reduced width
+    PADDLE_HEIGHT = 20  # Adjusted height
+    BALL_RADIUS = 2  # Reduced radius
+
     def __init__(self, game_id, play_mode):
         self.game_id = game_id
         self.play_mode = play_mode
-        self.left_paddle_x = 0  # Adjusted for edge position
-        self.left_paddle_y = 50
-        self.right_paddle_x = 100  # Adjusted for edge position
-        self.right_paddle_y = 50
-        self.ball_x = 50
-        self.ball_y = 50
+        self.left_paddle_x = 1  # Adjusted for edge position
+        self.left_paddle_y = 50 - Game.PADDLE_HEIGHT // 2
+        self.right_paddle_x = Game.WIDTH - 1 - Game.PADDLE_WIDTH  # Adjusted for edge position
+        self.right_paddle_y = 50 - Game.PADDLE_HEIGHT // 2
+        self.ball_x = Game.WIDTH // 2
+        self.ball_y = Game.HEIGHT // 2
         angle = math.radians(35)  # Convert 35 degrees to radians
-        self.ball_dx = math.cos(angle) * 0.7  # Adjust speed here
-        self.ball_dy = math.sin(angle) * 0.7  # Adjust speed here
+        self.ball_dx = math.cos(angle) * 1.2  # Adjust speed here
+        self.ball_dy = math.sin(angle) * 1.2  # Adjust speed here
         self.left_score = 0
         self.right_score = 0
         self.winner = None
@@ -27,21 +31,23 @@ class Game:
         self.loop_running = False  # Flag to indicate if the game loop is running
         self.left_paddle_movement = 0
         self.right_paddle_movement = 0
-        self.MOVEMENT_SPEED = 1
+        self.MOVEMENT_SPEED = 2  # Increase paddle speed
 
     def detect_collisions(self):
         # Check collision with left paddle
-        if self.ball_dx < 0 and self.ball_x <= self.left_paddle_x + 1 and abs(self.left_paddle_y - self.ball_y) <= 12:
-            self.ball_x = self.left_paddle_x + 1  # Prevent ball from going inside paddle
-            self.ball_dx *= -1
-        
+        if self.ball_dx < 0 and self.ball_x - Game.BALL_RADIUS <= self.left_paddle_x + Game.PADDLE_WIDTH:
+            if self.left_paddle_y <= self.ball_y <= self.left_paddle_y + Game.PADDLE_HEIGHT:
+                self.ball_x = self.left_paddle_x + Game.PADDLE_WIDTH + Game.BALL_RADIUS  # Prevent ball from going inside paddle
+                self.ball_dx *= -1
+
         # Check collision with right paddle
-        if self.ball_dx > 0 and self.ball_x >= self.right_paddle_x - 1 and abs(self.right_paddle_y - self.ball_y) <= 12:
-            self.ball_x = self.right_paddle_x - 1  # Prevent ball from going inside paddle
-            self.ball_dx *= -1
+        if self.ball_dx > 0 and self.ball_x + Game.BALL_RADIUS >= self.right_paddle_x:
+            if self.right_paddle_y <= self.ball_y <= self.right_paddle_y + Game.PADDLE_HEIGHT:
+                self.ball_x = self.right_paddle_x - Game.BALL_RADIUS  # Prevent ball from going inside paddle
+                self.ball_dx *= -1
 
         # Check collision with top and bottom walls
-        if self.ball_y <= 4 or self.ball_y >= 94:
+        if self.ball_y - Game.BALL_RADIUS <= 0 or self.ball_y + Game.BALL_RADIUS >= Game.HEIGHT:
             self.ball_dy *= -1
 
     def update_state(self):
@@ -51,27 +57,32 @@ class Game:
         self.left_paddle_y += self.left_paddle_movement
         self.right_paddle_y += self.right_paddle_movement
 
-        self.left_paddle_y = max(0, min(self.left_paddle_y, 100))
-        self.right_paddle_y = max(0, min(self.right_paddle_y, 100))
+        self.left_paddle_y = max(0, min(self.left_paddle_y, Game.HEIGHT - Game.PADDLE_HEIGHT))
+        self.right_paddle_y = max(0, min(self.right_paddle_y, Game.HEIGHT - Game.PADDLE_HEIGHT))
 
         # Check and handle ball collisions with the paddles and walls
         self.detect_collisions()
 
         # Handle scoring
-        if self.ball_x <= 0:
+        if self.ball_x - Game.BALL_RADIUS <= 0:
             self.right_score += 1
-            self.ball_x = 50
-            self.ball_y = 50
-        elif self.ball_x >= 100:
+            self.reset_ball()
+        elif self.ball_x + Game.BALL_RADIUS >= Game.WIDTH:
             self.left_score += 1
-            self.ball_x = 50
-            self.ball_y = 50
+            self.reset_ball()
 
         # Check for winner
         if self.left_score == 3:
             self.winner = "left"
         elif self.right_score == 3:
             self.winner = "right"
+
+    def reset_ball(self):
+        self.ball_x = Game.WIDTH // 2
+        self.ball_y = Game.HEIGHT // 2
+        angle = math.radians(35)
+        self.ball_dx = math.cos(angle) * 1.2
+        self.ball_dy = math.sin(angle) * 1.2
 
     def paddle_move_left(self, direction):
         if direction == "left_up":
@@ -80,14 +91,6 @@ class Game:
             self.left_paddle_movement = self.MOVEMENT_SPEED
         elif direction == "left_stop":
             self.left_paddle_movement = 0
-        
-        # Ensure the left paddle does not move beyond the top and bottom borders
-        if self.left_paddle_y + self.left_paddle_movement < 2:
-            self.left_paddle_y = 2
-            self.left_paddle_movement = 0
-        elif self.left_paddle_y + self.left_paddle_movement > 92:
-            self.left_paddle_y = 92
-            self.left_paddle_movement = 0
 
     def paddle_move_right(self, direction):
         if direction == "right_up":
@@ -95,14 +98,6 @@ class Game:
         elif direction == "right_down":
             self.right_paddle_movement = self.MOVEMENT_SPEED
         elif direction == "right_stop":
-            self.right_paddle_movement = 0
-        
-        # Ensure the right paddle does not move beyond the top and bottom borders
-        if self.right_paddle_y + self.right_paddle_movement < 2:
-            self.right_paddle_y = 2
-            self.right_paddle_movement = 0
-        elif self.right_paddle_y + self.right_paddle_movement > 92:
-            self.right_paddle_y = 92
             self.right_paddle_movement = 0
 
     def get_state(self):
@@ -226,7 +221,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = GameConsumer.games.get(game_id)  # Not from database
 
         while True:
-            await asyncio.sleep(1 / 90)  # 90 FPS
+            await asyncio.sleep(1 / 60)  # 60 FPS
 
             if game.winner:
                 state = game.get_state()
