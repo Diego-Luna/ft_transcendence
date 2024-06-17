@@ -76,7 +76,7 @@ class GameViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(
             {"error": "You are not the invitee of this game."},
-            status=status.HTTP_403_FORBIDDEN,
+            status=status.HTTP_200_OK,
         )
 
     # /api/games/:gameId/reject_game/`
@@ -92,7 +92,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
         return Response(
             {"error": "You are not the invitee of this game."},
-            status=status.HTTP_403_FORBIDDEN,
+            status=status.HTTP_200_OK,
         )
 
     # /api/games/:gameId/finish_game/`
