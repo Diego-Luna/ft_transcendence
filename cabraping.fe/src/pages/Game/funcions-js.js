@@ -181,7 +181,7 @@ export async function Game_js() {
   });
 
   document.addEventListener("keyup", (e) => {
-    if (game.playMode === 1) {
+    if (game.playMode === 1 && gameSocket && gameSocket.readyState === 1) {
       if (e.which === KEYS.W || e.which === KEYS.S) {
         gameSocket.send(
           JSON.stringify({ action: "move", direction: "left_stop" })
@@ -192,7 +192,7 @@ export async function Game_js() {
           JSON.stringify({ action: "move", direction: "right_stop" })
         );
       }
-    } else if (game.playMode === 2) {
+    } else if (game.playMode === 2 && gameSocket && gameSocket.readyState === 1) {
       if (isLeftPlayer) {
         if (e.which === KEYS.W || e.which === KEYS.S) {
           gameSocket.send(
@@ -214,7 +214,7 @@ export async function Game_js() {
     rightPaddleScoreElement.innerText = state.right_score || 0;
 
     if (!localStorage.getItem("system_game_id")) {
-      if (gameSocket.readyState === 1) {
+      if (gameSocket && gameSocket.readyState === 1) {
         gameSocket.close();
       }
 
@@ -224,7 +224,7 @@ export async function Game_js() {
     }
 
     if (state.winner) {
-      if (gameSocket.readyState === 1) {
+      if (gameSocket && gameSocket.readyState === 1) {
         gameSocket.close();
       }
 
