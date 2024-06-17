@@ -5,145 +5,148 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 from urllib.parse import parse_qs
 
+class Paddle:
+    WIDTH = 2
+    HEIGHT = 20
+    MOVEMENT_SPEED = 2
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.movement = 0
+
+    def move(self, direction):
+        if direction == "up":
+            self.movement = -Paddle.MOVEMENT_SPEED
+        elif direction == "down":
+            self.movement = Paddle.MOVEMENT_SPEED
+        elif direction == "stop":
+            self.movement = 0
+
+    def update(self, max_height):
+        self.y += self.movement
+        self.y = max(0, min(self.y, max_height - Paddle.HEIGHT))
+
+class Ball:
+    RADIUS = 2
+    SPEED = 1.5
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        angle = math.radians(35)
+        self.dx = math.cos(angle) * Ball.SPEED
+        self.dy = math.sin(angle) * Ball.SPEED
+
+    def update(self):
+        self.x += self.dx
+        self.y += self.dy
+
+    def reset(self, width, height):
+        self.x = width // 2
+        self.y = height // 2
+        angle = math.radians(35)
+        self.dx = math.cos(angle) * Ball.SPEED
+        self.dy = math.sin(angle) * Ball.SPEED
+
+    def detect_collision(self, paddle_left, paddle_right, width, height):
+        if self.y - Ball.RADIUS <= 0 or self.y + Ball.RADIUS >= height:
+            self.dy *= -1
+
+        if self.dx < 0 and self.x - Ball.RADIUS <= paddle_left.x + Paddle.WIDTH:
+            if paddle_left.y <= self.y <= paddle_left.y + Paddle.HEIGHT:
+                self.x = paddle_left.x + Paddle.WIDTH + Ball.RADIUS
+                self.dx *= -1
+
+        if self.dx > 0 and self.x + Ball.RADIUS >= paddle_right.x:
+            if paddle_right.y <= self.y <= paddle_right.y + Paddle.HEIGHT:
+                self.x = paddle_right.x - Ball.RADIUS
+                self.dx *= -1
+
 class Game:
     WIDTH = 100
     HEIGHT = 100
-    PADDLE_WIDTH = 2  # Reduced width
-    PADDLE_HEIGHT = 20  # Adjusted height
-    BALL_RADIUS = 2  # Reduced radius
 
     def __init__(self, game_id, play_mode):
         self.game_id = game_id
         self.play_mode = play_mode
-        self.left_paddle_x = 1  # Adjusted for edge position
-        self.left_paddle_y = 50 - Game.PADDLE_HEIGHT // 2
-        self.right_paddle_x = Game.WIDTH - 1 - Game.PADDLE_WIDTH  # Adjusted for edge position
-        self.right_paddle_y = 50 - Game.PADDLE_HEIGHT // 2
-        self.ball_x = Game.WIDTH // 2
-        self.ball_y = Game.HEIGHT // 2
-        angle = math.radians(35)  # Convert 35 degrees to radians
-        self.ball_dx = math.cos(angle) * 1.2  # Adjust speed here
-        self.ball_dy = math.sin(angle) * 1.2  # Adjust speed here
+        self.paddle_left = Paddle(1, 50 - Paddle.HEIGHT // 2)
+        self.paddle_right = Paddle(Game.WIDTH - Paddle.WIDTH - 1, 50 - Paddle.HEIGHT // 2)
+        self.ball = Ball(Game.WIDTH // 2, Game.HEIGHT // 2)
         self.left_score = 0
         self.right_score = 0
         self.winner = None
-        self.players = {"left": None, "right": None}  # Track players
-        self.loop_running = False  # Flag to indicate if the game loop is running
-        self.left_paddle_movement = 0
-        self.right_paddle_movement = 0
-        self.MOVEMENT_SPEED = 2  # Increase paddle speed
-
-    def detect_collisions(self):
-        # Check collision with left paddle
-        if self.ball_dx < 0 and self.ball_x - Game.BALL_RADIUS <= self.left_paddle_x + Game.PADDLE_WIDTH:
-            if self.left_paddle_y <= self.ball_y <= self.left_paddle_y + Game.PADDLE_HEIGHT:
-                self.ball_x = self.left_paddle_x + Game.PADDLE_WIDTH + Game.BALL_RADIUS  # Prevent ball from going inside paddle
-                self.ball_dx *= -1
-
-        # Check collision with right paddle
-        if self.ball_dx > 0 and self.ball_x + Game.BALL_RADIUS >= self.right_paddle_x:
-            if self.right_paddle_y <= self.ball_y <= self.right_paddle_y + Game.PADDLE_HEIGHT:
-                self.ball_x = self.right_paddle_x - Game.BALL_RADIUS  # Prevent ball from going inside paddle
-                self.ball_dx *= -1
-
-        # Check collision with top and bottom walls
-        if self.ball_y - Game.BALL_RADIUS <= 0 or self.ball_y + Game.BALL_RADIUS >= Game.HEIGHT:
-            self.ball_dy *= -1
+        self.players = {"left": None, "right": None}
+        self.loop_running = False
 
     def update_state(self):
-        self.ball_x += self.ball_dx
-        self.ball_y += self.ball_dy
+        self.ball.update()
+        self.paddle_left.update(Game.HEIGHT)
+        self.paddle_right.update(Game.HEIGHT)
+        self.ball.detect_collision(self.paddle_left, self.paddle_right, Game.WIDTH, Game.HEIGHT)
 
-        self.left_paddle_y += self.left_paddle_movement
-        self.right_paddle_y += self.right_paddle_movement
-
-        self.left_paddle_y = max(0, min(self.left_paddle_y, Game.HEIGHT - Game.PADDLE_HEIGHT))
-        self.right_paddle_y = max(0, min(self.right_paddle_y, Game.HEIGHT - Game.PADDLE_HEIGHT))
-
-        # Check and handle ball collisions with the paddles and walls
-        self.detect_collisions()
-
-        # Handle scoring
-        if self.ball_x - Game.BALL_RADIUS <= 0:
+        if self.ball.x - Ball.RADIUS <= 0:
             self.right_score += 1
-            self.reset_ball()
-        elif self.ball_x + Game.BALL_RADIUS >= Game.WIDTH:
+            self.ball.reset(Game.WIDTH, Game.HEIGHT)
+        elif self.ball.x + Ball.RADIUS >= Game.WIDTH:
             self.left_score += 1
-            self.reset_ball()
+            self.ball.reset(Game.WIDTH, Game.HEIGHT)
 
-        # Check for winner
         if self.left_score == 3:
             self.winner = "left"
         elif self.right_score == 3:
             self.winner = "right"
 
-    def reset_ball(self):
-        self.ball_x = Game.WIDTH // 2
-        self.ball_y = Game.HEIGHT // 2
-        angle = math.radians(35)
-        self.ball_dx = math.cos(angle) * 1.2
-        self.ball_dy = math.sin(angle) * 1.2
-
     def paddle_move_left(self, direction):
         if direction == "left_up":
-            self.left_paddle_movement = -self.MOVEMENT_SPEED
+            self.paddle_left.move("up")
         elif direction == "left_down":
-            self.left_paddle_movement = self.MOVEMENT_SPEED
+            self.paddle_left.move("down")
         elif direction == "left_stop":
-            self.left_paddle_movement = 0
+            self.paddle_left.move("stop")
 
     def paddle_move_right(self, direction):
         if direction == "right_up":
-            self.right_paddle_movement = -self.MOVEMENT_SPEED
+            self.paddle_right.move("up")
         elif direction == "right_down":
-            self.right_paddle_movement = self.MOVEMENT_SPEED
+            self.paddle_right.move("down")
         elif direction == "right_stop":
-            self.right_paddle_movement = 0
+            self.paddle_right.move("stop")
 
     def get_state(self):
         return {
-            "left_paddle_y": self.left_paddle_y,
-            "right_paddle_y": self.right_paddle_y,
-            "ball_x": self.ball_x,
-            "ball_y": self.ball_y,
+            "left_paddle_y": self.paddle_left.y,
+            "right_paddle_y": self.paddle_right.y,
+            "ball_x": self.ball.x,
+            "ball_y": self.ball.y,
             "left_score": self.left_score,
             "right_score": self.right_score,
             "winner": self.winner,
         }
 
-
 class GameConsumer(AsyncWebsocketConsumer):
-    games = {}  # Temporary games list being played as a cache
+    games = {}
 
     async def connect(self):
         self.game_id = self.scope["url_route"]["kwargs"]["game_id"]
         self.game_group_name = f"game_{self.game_id}"
 
-        # Parse query string to get playMode
         query_string = self.scope["query_string"].decode()
         query_params = parse_qs(query_string)
-        self.play_mode = int(
-            query_params.get("playMode", [0])[0]
-        )  # Default to 0 if not provided
+        self.play_mode = int(query_params.get("playMode", [0])[0])
 
-        # Game loop for computation
         if self.game_id not in self.games:
             self.games[self.game_id] = Game(self.game_id, self.play_mode)
 
-        # Join game group for communication/connection on WebSocket
         await self.channel_layer.group_add(self.game_group_name, self.channel_name)
-
         await self.accept()
 
-        # Assign player to left or right paddle
         game = self.games[self.game_id]
-
         if game.players["left"] is None:
             game.players["left"] = self.channel_name
         elif game.players["right"] is None:
             game.players["right"] = self.channel_name
 
-        # Notify the game group that a player joined
         await self.channel_layer.group_send(
             self.game_group_name,
             {
@@ -153,12 +156,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             },
         )
 
-        # Check if both players have joined
-        if (
-            game.play_mode == 1 or (game.players["left"] and game.players["right"])
-        ) and not game.loop_running:
-            # Notify players that the game is starting
-            game.loop_running = True  # Mark the game loop as running
+        if (game.play_mode == 1 or (game.players["left"] and game.players["right"])) and not game.loop_running:
+            game.loop_running = True
             await self.channel_layer.group_send(
                 self.game_group_name,
                 {
@@ -166,26 +165,20 @@ class GameConsumer(AsyncWebsocketConsumer):
                     "message": "Both players have joined. The game is starting!",
                 },
             )
-            # Start the game loop
             asyncio.create_task(self.game_loop(self.game_id))
 
     async def disconnect(self, close_code):
-        # Leave game group
         await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-
-        # Pause the game / Remove the player from the game
         game = self.games[self.game_id]
         if game.players["left"] == self.channel_name:
             game.players["left"] = None
         elif game.players["right"] == self.channel_name:
             game.players["right"] = None
 
-    # Receive message from WebSocket
     async def receive(self, text_data):
         data = json.loads(text_data)
         game = self.games[self.game_id]
 
-        # Handle paddle movement
         if data["action"] == "move":
             direction = data["direction"]
             if "left" in direction:
@@ -203,11 +196,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             },
         )
 
-    # Receive message from game group
     async def game_state_message(self, event):
         message = event["message"]
-
-        # Send message to WebSocket
         await self.send(
             text_data=json.dumps(
                 {
@@ -218,7 +208,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     async def game_loop(game_id):
-        game = GameConsumer.games.get(game_id)  # Not from database
+        game = GameConsumer.games.get(game_id)
 
         while True:
             await asyncio.sleep(1 / 60)  # 60 FPS

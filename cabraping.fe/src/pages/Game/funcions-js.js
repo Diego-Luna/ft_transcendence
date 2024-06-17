@@ -106,14 +106,14 @@ export async function Game_js() {
   const ballRadius = (grid * 1.5) / 2;
 
   const leftPaddle = {
-    x: grid * 2,
+    x: grid, // Position at the very left edge
     y: canvasElement.height / 2 - paddleHeight / 2,
     width: paddleWidth,
     height: paddleHeight,
     dy: 0,
   };
   const rightPaddle = {
-    x: canvasElement.width - grid * 4,
+    x: canvasElement.width - paddleWidth - grid, // Position at the very right edge
     y: canvasElement.height / 2 - paddleHeight / 2,
     width: paddleWidth,
     height: paddleHeight,
@@ -280,23 +280,28 @@ export async function Game_js() {
     const canvasWidth = canvasElement.width;
     const canvasHeight = canvasElement.height;
 
-    const leftPaddleY =
-      (state.left_paddle_y / 100) * (canvasHeight - paddleHeight);
-    const rightPaddleY =
-      (state.right_paddle_y / 100) * (canvasHeight - paddleHeight);
-    const ballX = (state.ball_x / 100) * canvasWidth;
-    const ballY = (state.ball_y / 100) * canvasHeight;
+    leftPaddle.y =
+      (state.left_paddle_y / 100) * (canvasHeight - paddleHeight) + 10;
+    rightPaddle.y =
+      (state.right_paddle_y / 100) * (canvasHeight - paddleHeight) + 10;
+    ball.x = (state.ball_x / 100) * canvasWidth;
+    ball.y = (state.ball_y / 100) * canvasHeight;
 
     context.fillStyle = "white";
-    context.fillRect(leftPaddle.x, leftPaddleY, leftPaddle.width, paddleHeight);
+    context.fillRect(
+      leftPaddle.x,
+      leftPaddle.y,
+      leftPaddle.width,
+      leftPaddle.height
+    );
     context.fillRect(
       rightPaddle.x,
-      rightPaddleY,
+      rightPaddle.y,
       rightPaddle.width,
-      paddleHeight
+      rightPaddle.height
     );
     context.beginPath();
-    context.arc(ballX, ballY, ballRadius, 0, 2 * Math.PI);
+    context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
     context.fill();
 
     context.fillStyle = "lightgrey";
