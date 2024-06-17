@@ -8,7 +8,7 @@ from urllib.parse import parse_qs
 class Paddle:
     WIDTH = 2
     HEIGHT = 20
-    MOVEMENT_SPEED = 2
+    MOVEMENT_SPEED = 2.5
 
     def __init__(self, x, y):
         self.x = x
@@ -36,7 +36,7 @@ class Paddle:
 
 class Ball:
     RADIUS = 2
-    SPEED = 2
+    SPEED = 1.2
 
     def __init__(self, x, y):
         self.x = x
@@ -218,7 +218,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         game = GameConsumer.games.get(game_id)
 
         while True:
-            await asyncio.sleep(1 / 70)  # 60 FPS
+            await asyncio.sleep(1 / 100)  # 60 FPS
 
             if game.winner:
                 state = game.get_state()
